@@ -32,6 +32,9 @@ importers:
       idb-keyval:
         specifier: ^6.2.2
         version: 6.2.2
+      lucide-vue-next:
+        specifier: ^0.553.0
+        version: 0.553.0(vue@3.5.18(typescript@5.9.2))
       md5:
         specifier: ^2.2.1
         version: 2.3.0
@@ -2593,6 +2596,11 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  lucide-vue-next@0.553.0:
+    resolution: {integrity: sha512-0tg9XT+VCElTT+7EXXbBRhWe1nU7Doa32Xv/dHP5/LCleFVgV6cAqziM3C7AetqmsYIsfAtNwRYdtvs4Ds7aUg==}
+    peerDependencies:
+      vue: '>=3.0.1'
 
   magic-string-ast@0.7.1:
     resolution: {integrity: sha512-ub9iytsEbT7Yw/Pd29mSo/cNQpaEu67zR1VVcXDiYjSFwzeBxNdTd0FMnSslLQXiRj8uGPzwsaoefrMD5XAmdw==}
@@ -6503,6 +6511,10 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-vue-next@0.553.0(vue@3.5.18(typescript@5.9.2)):
+    dependencies:
+      vue: 3.5.18(typescript@5.9.2)
 
   magic-string-ast@0.7.1:
     dependencies:

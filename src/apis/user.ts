@@ -1,5 +1,5 @@
 import http from '@/utils/http.ts'
-import {CodeType} from "@/types/types.ts";
+import { CodeType } from "@/types/types.ts";
 
 // 用户登录接口
 export interface LoginParams {
@@ -85,4 +85,9 @@ export function refreshToken() {
 // 获取用户信息
 export function getUserInfo() {
   return http<LoginResponse['user']>('user/userInfo', null, null, 'get')
+}
+
+// 设置密码
+export function setPassword(password: string) {
+  return http('user/setPassword', {password}, null, 'post')
 }

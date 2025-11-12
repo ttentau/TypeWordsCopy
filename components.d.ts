@@ -65,6 +65,7 @@ declare module 'vue' {
     IconFluentEyeOff16Regular: typeof import('~icons/fluent/eye-off16-regular')['default']
     IconFluentHome20Regular: typeof import('~icons/fluent/home20-regular')['default']
     IconFluentKeyboardLayoutFloat20Regular: typeof import('~icons/fluent/keyboard-layout-float20-regular')['default']
+    IconFluentMail20Regular: typeof import('~icons/fluent/mail20-regular')['default']
     IconFluentMyLocation20Regular: typeof import('~icons/fluent/my-location20-regular')['default']
     IconFluentPaddingLeft20Regular: typeof import('~icons/fluent/padding-left20-regular')['default']
     IconFluentPerson20Regular: typeof import('~icons/fluent/person20-regular')['default']

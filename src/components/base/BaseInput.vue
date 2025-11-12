@@ -33,7 +33,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur', 'validation']);
+const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur', 'validation', 'enter']);
 const attrs = useAttrs();
 
 const inputValue = ref(props.modelValue);
@@ -78,6 +78,10 @@ const onBlur = (e: FocusEvent) => {
   emit('blur', e);
 };
 
+const onEnter = (e: KeyboardEvent) => {
+  emit('enter', e);
+};
+
 const clearInput = () => {
   inputValue.value = '';
   emit('update:modelValue', '');
@@ -112,6 +116,7 @@ const vFocus = {
       @change="onChange"
       @focus="onFocus"
       @blur="onBlur"
+      @keydown.enter="onEnter"
       class="inner"
       v-focus="autofocus"
       :maxlength="maxLength"

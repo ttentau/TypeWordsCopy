@@ -219,12 +219,12 @@ a {
   text-decoration: none;
 }
 
-.link{
+.link {
   color: var(--color-link);
   @apply hover:opacity-80;
 }
 
-.cp{
+.cp {
   @apply cursor-pointer;
 }
 
@@ -422,6 +422,8 @@ a {
 .line {
   width: 100%;
   border-bottom: 1px solid var(--color-item-border);
+  @apply hover:text-blue-700;
+
 }
 
 .line-white {

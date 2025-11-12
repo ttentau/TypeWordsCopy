@@ -62,7 +62,7 @@ defineEmits(['click'])
   color: white;
 
   & + .base-button {
-    margin-left: var(--space);
+    margin-left: 1rem;
   }
 
   .loading {
