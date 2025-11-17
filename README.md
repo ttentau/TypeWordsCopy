@@ -35,14 +35,14 @@
 
 ## 在线访问
 
-中国: [https://2study.top](https://2study.top)   
-其他: [https://vercel.2study.top](https://vercel.2study.top) or [https://tw.2study.top](https://tw.2study.top)
+中国: [https://typewords.cc](https://typewords.cc)   
+其他: [https://vercel.typewords.cc](https://vercel.typewords.cc) or [https://tw.typewords.cc](https://tw.typewords.cc)
 
 ## 功能列表
 
 ### 单词练习
 
-- 四种练习模式：跟打 / 辨认 / 听习 / 默写
+- 三种输入模式：跟打 / 复习 / 默写
 - 智能模式：记忆曲线自动计算学习单词，并通过默写加深记忆
 - 自由模式：不受限制，自行规划
 - 提供音标、发音（美音、英音）、例句、短语、近义词、同根词、词源、错误统计等功能

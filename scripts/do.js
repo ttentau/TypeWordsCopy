@@ -6,7 +6,7 @@ const fs = require('fs')
 async function generateSitemap() {
   const bookList = require('../public/list/article.json')
   const dictList = require('../public/list/word.json')
-  const SITE_URL = 'https://2study.top'
+  const SITE_URL = 'https://typewords.cc'
 
   // 静态路由（首页、练习页等）
   const staticPages = [

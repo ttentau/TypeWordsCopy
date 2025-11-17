@@ -300,6 +300,9 @@ function del() {
 
 function showWord() {
   if (settingStore.allowWordTip) {
+    if (settingStore.wordPracticeType === WordPracticeType.Dictation || settingStore.dictation) {
+      emit('wrong')
+    }
     showFullWord = true
     //系统设定的默认模式情况下，如果看了单词统计到错词里面去
     switch (statStore.step) {
@@ -321,7 +324,7 @@ function hideWord() {
 }
 
 function play() {
-  if (settingStore.wordPracticeType === WordPracticeType.Dictation) {
+  if (settingStore.wordPracticeType === WordPracticeType.Dictation || settingStore.dictation) {
     emit('wrong')
   }
   volumeIconRef?.play()

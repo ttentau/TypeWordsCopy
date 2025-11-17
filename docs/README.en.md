@@ -39,8 +39,8 @@ Practice English, one strike, one step forward
 
 ## Online visit
 
-China:<https://2study.top>  
-other:<https://vercel.2study.top> or <https://tw.2study.top>
+China:<https://typewords.cc>  
+other:<https://vercel.typewords.cc> or <https://tw.typewords.cc>
 
 ## Feature list
 
