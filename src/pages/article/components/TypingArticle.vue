@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import {inject, onMounted, onUnmounted, watch} from "vue"
-import {Article, ArticleWord, PracticeArticleWordType, Sentence, ShortcutKey, Word} from "@/types/types.ts";
-import {useBaseStore} from "@/stores/base.ts";
-import {useSettingStore} from "@/stores/setting.ts";
-import {usePlayBeep, usePlayCorrect, usePlayKeyboardAudio} from "@/hooks/sound.ts";
-import {emitter, EventKey, useEvents} from "@/utils/eventBus.ts";
-import {_dateFormat, _nextTick, isMobile, msToHourMinute, total} from "@/utils";
+import { inject, onMounted, onUnmounted, watch } from "vue"
+import { Article, ArticleWord, PracticeArticleWordType, Sentence, ShortcutKey, Word } from "@/types/types.ts";
+import { useBaseStore } from "@/stores/base.ts";
+import { useSettingStore } from "@/stores/setting.ts";
+import { usePlayBeep, usePlayCorrect, usePlayKeyboardAudio } from "@/hooks/sound.ts";
+import { emitter, EventKey, useEvents } from "@/utils/eventBus.ts";
+import { _dateFormat, _nextTick, isMobile, msToHourMinute, total } from "@/utils";
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import BaseButton from "@/components/BaseButton.vue";
 import QuestionForm from "@/pages/article/components/QuestionForm.vue";
-import {getDefaultArticle, getDefaultWord} from "@/types/func.ts";
+import { getDefaultArticle, getDefaultWord } from "@/types/func.ts";
 import Toast from '@/components/base/toast/Toast.ts'
 import TypingWord from "@/pages/article/components/TypingWord.vue";
 import Space from "@/pages/article/components/Space.vue";
-import {useWordOptions} from "@/hooks/dict.ts";
+import { useWordOptions } from "@/hooks/dict.ts";
 import nlp from "compromise/three";
-import {nanoid} from "nanoid";
-import {usePracticeStore} from "@/stores/practice.ts";
-import {PracticeSaveArticleKey} from "@/config/env.ts";
-import {retry} from "ali-oss/lib/common/utils/retry";
+import { nanoid } from "nanoid";
+import { usePracticeStore } from "@/stores/practice.ts";
+import { PracticeSaveArticleKey } from "@/config/env.ts";
 
 interface IProps {
   article: Article,
@@ -401,7 +400,7 @@ function onTyping(e: KeyboardEvent) {
       if (!currentWord.word[stringIndex]) {
         input = ''
         //如果不是符号，播放完成音效
-        if (currentWord.type === PracticeArticleWordType.Word) playCorrect()
+        // if (currentWord.type === PracticeArticleWordType.Word) playCorrect()
         if (currentWord.nextSpace) {
           isSpace = true
         } else {
