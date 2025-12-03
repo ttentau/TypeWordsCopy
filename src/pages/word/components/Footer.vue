@@ -7,6 +7,7 @@ import { PracticeData, WordPracticeType, ShortcutKey, TaskWords } from "@/types/
 import BaseIcon from "@/components/BaseIcon.vue";
 import Tooltip from "@/components/base/Tooltip.vue";
 import Progress from '@/components/base/Progress.vue'
+import SettingDialog from "@/pages/word/components/SettingDialog.vue";
 
 const statStore = usePracticeStore()
 const settingStore = useSettingStore()
@@ -123,6 +124,8 @@ const progress = $computed(() => {
           </div>
         </div>
         <div class="flex gap-2 justify-center items-center" id="toolbar-icons">
+          <SettingDialog type="word"/>
+
           <BaseIcon
               v-if="statStore.step < 9"
               @click="emit('skipStep')"
