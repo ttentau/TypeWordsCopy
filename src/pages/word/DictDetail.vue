@@ -278,7 +278,7 @@ function importData(e) {
   reader.onload = async function (s) {
     let data = s.target.result;
     importLoading = true
-    const XLSX = await loadJsLib('XLSX', `${Origin}/libs/xlsx.full.min.js`);
+    const XLSX = await loadJsLib('XLSX', LIB_JS_URL.XLSX);
     let workbook = XLSX.read(data, {type: 'binary'});
     let res: any[] = XLSX.utils.sheet_to_json(workbook.Sheets['Sheet1']);
     if (res.length) {
@@ -357,7 +357,7 @@ function importData(e) {
 
 async function exportData() {
   exportLoading = true
-  const XLSX = await loadJsLib('XLSX', `${Origin}/libs/xlsx.full.min.js`);
+  const XLSX = await loadJsLib('XLSX', LIB_JS_URL.XLSX);
   let list = runtimeStore.editDict.words
   let filename = runtimeStore.editDict.name
   let wb = XLSX.utils.book_new()

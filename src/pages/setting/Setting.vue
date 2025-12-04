@@ -18,7 +18,7 @@ import {useBaseStore} from "@/stores/base.ts";
 import {saveAs} from "file-saver";
 import {
   APP_NAME, APP_VERSION, EMAIL,
-  EXPORT_DATA_KEY, GITHUB, Host,
+  EXPORT_DATA_KEY, GITHUB, Host, LIB_JS_URL,
   LOCAL_FILE_KEY,
   Origin,
   PracticeSaveArticleKey,
@@ -253,7 +253,7 @@ async function importData(e) {
     reader.readAsText(file);
   } else if (file.name.endsWith(".zip")) {
     try {
-      const JSZip = await loadJsLib('JSZip', `${Origin}/libs/jszip.min.js`);
+      const JSZip = await loadJsLib('JSZip', LIB_JS_URL.JSZIP);
       const zip = await JSZip.loadAsync(file);
 
       const dataFile = zip.file("data.json");

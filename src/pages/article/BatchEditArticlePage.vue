@@ -15,7 +15,7 @@ import {getDefaultArticle} from "@/types/func.ts";
 import BackIcon from "@/components/BackIcon.vue";
 import MiniDialog from "@/components/dialog/MiniDialog.vue";
 import {onMounted} from "vue";
-import {Origin} from "@/config/env.ts";
+import { LIB_JS_URL, Origin } from "@/config/env.ts";
 import {syncBookInMyStudyList} from "@/hooks/article.ts";
 
 const base = useBaseStore()
@@ -132,7 +132,7 @@ function importData(e: any) {
   let reader = new FileReader();
   reader.onload = async function (s) {
     importLoading = true
-    const XLSX = await loadJsLib('XLSX', `${Origin}/libs/xlsx.full.min.js`);
+    const XLSX = await loadJsLib('XLSX', LIB_JS_URL.XLSX);
     let data = s.target.result;
     let workbook = XLSX.read(data, {type: 'binary'});
     let res: any[] = XLSX.utils.sheet_to_json(workbook.Sheets['Sheet1']);
@@ -198,7 +198,7 @@ function importData(e: any) {
 
 async function exportData(val: { type: string, data?: Article }) {
   exportLoading = true
-  const XLSX = await loadJsLib('XLSX', `${Origin}/libs/xlsx.full.min.js`);
+  const XLSX = await loadJsLib('XLSX', LIB_JS_URL.XLSX);
   const {type, data} = val
   let list = []
   let filename = ''

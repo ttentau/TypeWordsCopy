@@ -2,7 +2,7 @@ version: "2"
 services:
   typeword:
     image: "node:latest"
-    #environment: #按需配置，主要为了科学上网解决依赖安装网络问题
+    #environment: #按需配置， 主要为了科学上网解决依赖安装网络问题
     #  - HTTP_PROXY=http://127.0.0.1:80
     #    HTTPS_PROXY=http://127.0.0.1:80
     working_dir: /home/node/app

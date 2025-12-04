@@ -99,6 +99,7 @@ declare module 'vue' {
     IconFluentSlideTextTitleEdit20Regular: typeof import('~icons/fluent/slide-text-title-edit20-regular')['default']
     IconFluentSparkle20Regular: typeof import('~icons/fluent/sparkle20-regular')['default']
     IconFluentSpeakerEdit20Regular: typeof import('~icons/fluent/speaker-edit20-regular')['default']
+    IconFluentSpeakerSettings20Regular: typeof import('~icons/fluent/speaker-settings20-regular')['default']
     IconFluentStar16Filled: typeof import('~icons/fluent/star16-filled')['default']
     IconFluentStar16Regular: typeof import('~icons/fluent/star16-regular')['default']
     IconFluentStar20Filled: typeof import('~icons/fluent/star20-filled')['default']

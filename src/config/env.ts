@@ -94,5 +94,7 @@ export const LIB_JS_URL = {
   SHEPHERD: import.meta.env.MODE === 'development' ?
     'https://cdn.jsdelivr.net/npm/shepherd.js@14.5.1/dist/esm/shepherd.mjs'
     : Origin + '/libs/Shepherd.14.5.1.mjs',
-  SNAPDOM: `${Origin}/libs/snapdom.min.js`
+  SNAPDOM: `${Origin}/libs/snapdom.min.js`,
+  JSZIP: `${Origin}/libs/jszip.min.js`,
+  XLSX: `${Origin}/libs/xlsx.full.min.js`,
 }
