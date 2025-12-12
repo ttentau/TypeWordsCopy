@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, provide, ref, watch} from "vue";
+import { onMounted, onUnmounted, provide, ref, watch } from "vue";
 
 import Statistics from "@/pages/word/Statistics.vue";
 import { emitter, EventKey, useEvents } from "@/utils/eventBus.ts";
@@ -25,9 +25,10 @@ import { getDefaultDict, getDefaultWord } from "@/types/func.ts";
 import ConflictNotice from "@/components/ConflictNotice.vue";
 import PracticeLayout from "@/components/PracticeLayout.vue";
 
-import { DICT_LIST, LIB_JS_URL, PracticeSaveWordKey, TourConfig } from "@/config/env.ts";
+import { AppEnv, DICT_LIST, LIB_JS_URL, PracticeSaveWordKey, TourConfig } from "@/config/env.ts";
 import { ToastInstance } from "@/components/base/toast/type.ts";
 import { watchOnce } from "@vueuse/core";
+import { setUserDictProp } from "@/apis";
 
 const {
   isWordCollect,
@@ -562,7 +563,7 @@ function togglePanel() {
   settingStore.showPanel = !settingStore.showPanel
 }
 
-function continueStudy() {
+async function continueStudy() {
   let temp = cloneDeep(taskWords)
   //随机练习单独处理
   if (taskWords.shuffle.length) {
@@ -583,6 +584,13 @@ function continueStudy() {
   }
   emitter.emit(EventKey.resetWord)
   initData(temp)
+
+  if (AppEnv.CAN_REQUEST) {
+    let res = await setUserDictProp(null, {...store.sdict, type: 'word'})
+    if (!res.success) {
+      Toast.error(res.msg)
+    }
+  }
 }
 
 function randomWrite() {
@@ -629,8 +637,8 @@ useEvents([
 
 <template>
   <PracticeLayout
-      v-loading="loading"
-      panelLeft="var(--word-panel-margin-left)">
+    v-loading="loading"
+    panelLeft="var(--word-panel-margin-left)">
     <template v-slot:practice>
       <div class="practice-word">
         <div class="absolute z-1 top-4   w-full" v-if="settingStore.showNearWord">
@@ -639,7 +647,7 @@ useEvents([
                v-if="prevWord">
             <IconFluentArrowLeft16Regular class="arrow" width="22"/>
             <Tooltip
-                :title="`上一个(${settingStore.shortcutKeyMap[ShortcutKey.Previous]})`"
+              :title="`上一个(${settingStore.shortcutKeyMap[ShortcutKey.Previous]})`"
             >
               <div class="word">{{ prevWord.word }}</div>
             </Tooltip>
@@ -648,7 +656,7 @@ useEvents([
                @click="next(false)"
                v-if="nextWord">
             <Tooltip
-                :title="`下一个(${settingStore.shortcutKeyMap[ShortcutKey.Next]})`"
+              :title="`下一个(${settingStore.shortcutKeyMap[ShortcutKey.Next]})`"
             >
               <div class="word" :class="settingStore.dictation && 'word-shadow'">{{ nextWord.word }}</div>
             </Tooltip>
@@ -656,11 +664,11 @@ useEvents([
           </div>
         </div>
         <TypeWord
-            ref="typingRef"
-            :word="word"
-            @wrong="onTypeWrong"
-            @complete="next"
-            @know="onWordKnow"
+          ref="typingRef"
+          :word="word"
+          @wrong="onTypeWrong"
+          @complete="next"
+          @know="onWordKnow"
         />
       </div>
     </template>
@@ -672,41 +680,41 @@ useEvents([
             <span>{{ store.sdict.name }} ({{ store.sdict.lastLearnIndex }} / {{ store.sdict.length }})</span>
 
             <BaseIcon
-                @click="continueStudy"
-                :title="`下一组(${settingStore.shortcutKeyMap[ShortcutKey.NextChapter]})`">
+              @click="continueStudy"
+              :title="`下一组(${settingStore.shortcutKeyMap[ShortcutKey.NextChapter]})`">
               <IconFluentArrowRight16Regular class="arrow" width="22"/>
             </BaseIcon>
             <BaseIcon
-                @click="randomWrite"
-                :title="`随机默写(${settingStore.shortcutKeyMap[ShortcutKey.RandomWrite]})`">
+              @click="randomWrite"
+              :title="`随机默写(${settingStore.shortcutKeyMap[ShortcutKey.RandomWrite]})`">
               <IconFluentArrowShuffle16Regular class="arrow" width="22"/>
             </BaseIcon>
           </div>
         </template>
         <div class="panel-page-item pl-4">
           <WordList
-              v-if="data.words.length"
-              :is-active="settingStore.showPanel"
-              :static="false"
-              :show-word="!settingStore.dictation"
-              :show-translate="settingStore.translate"
-              :list="data.words"
-              :activeIndex="data.index"
-              @click="(val:any) => data.index = val.index"
+            v-if="data.words.length"
+            :is-active="settingStore.showPanel"
+            :static="false"
+            :show-word="!settingStore.dictation"
+            :show-translate="settingStore.translate"
+            :list="data.words"
+            :activeIndex="data.index"
+            @click="(val:any) => data.index = val.index"
           >
             <template v-slot:suffix="{item,index}">
               <BaseIcon
-                  :class="!isWordCollect(item)?'collect':'fill'"
-                  @click.stop="toggleWordCollect(item)"
-                  :title="!isWordCollect(item) ? '收藏' : '取消收藏'">
+                :class="!isWordCollect(item)?'collect':'fill'"
+                @click.stop="toggleWordCollect(item)"
+                :title="!isWordCollect(item) ? '收藏' : '取消收藏'">
                 <IconFluentStar16Regular v-if="!isWordCollect(item)"/>
                 <IconFluentStar16Filled v-else/>
               </BaseIcon>
 
               <BaseIcon
-                  :class="!isWordSimple(item)?'collect':'fill'"
-                  @click.stop="toggleWordSimple(item)"
-                  :title="!isWordSimple(item) ? '标记为已掌握' : '取消标记已掌握'">
+                :class="!isWordSimple(item)?'collect':'fill'"
+                @click.stop="toggleWordSimple(item)"
+                :title="!isWordSimple(item) ? '标记为已掌握' : '取消标记已掌握'">
                 <IconFluentCheckmarkCircle16Regular v-if="!isWordSimple(item)"/>
                 <IconFluentCheckmarkCircle16Filled v-else/>
               </BaseIcon>
@@ -718,12 +726,12 @@ useEvents([
     </template>
     <template v-slot:footer>
       <Footer
-          :is-simple="isWordSimple(word)"
-          @toggle-simple="toggleWordSimpleWrapper"
-          :is-collect="isWordCollect(word)"
-          @toggle-collect="toggleWordCollect(word)"
-          @skip="next(false)"
-          @skipStep="skipStep"
+        :is-simple="isWordSimple(word)"
+        @toggle-simple="toggleWordSimpleWrapper"
+        :is-collect="isWordCollect(word)"
+        @toggle-collect="toggleWordCollect(word)"
+        @skip="next(false)"
+        @skipStep="skipStep"
       />
     </template>
   </PracticeLayout>
