@@ -51,7 +51,7 @@ const studyProgress = $computed(() => {
                 class="absolute left-3 bottom-3 z-2"/>
       <div class="custom z-1" v-if="item.custom">自定义</div>
       <div class="custom bg-red! color-white z-1" v-else-if="item.update">更新中</div>
-      <div class="sync bg-red! color-white z-1" v-if="!item.sync && isUser && !showCheckbox">未同步</div>
+<!--      <div class="sync bg-red! color-white z-1" v-if="!item.sync && isUser && !showCheckbox">未同步</div>-->
     </div>
     <div class="text-base mt-1" v-if="item?.cover">{{ item?.name }}</div>
   </div>
