@@ -245,6 +245,38 @@ async function onTyping(e: KeyboardEvent) {
     } else {
       right = letter === word[input.length]
     }
+    //针对中文的特殊判断
+    if (e.shiftKey && (
+        '！' === word[input.length] && e.code === 'Digit1' ||
+        '￥' === word[input.length] && e.code === 'Digit4' ||
+        '…' === word[input.length] && e.code === 'Digit6' ||
+        '（' === word[input.length] && e.code === 'Digit9' ||
+        '—' === word[input.length] && e.code === 'Minus' ||
+        '？' === word[input.length] && e.code === 'Slash' ||
+        '》' === word[input.length] && e.code === 'Period' ||
+        '《' === word[input.length] && e.code === 'Comma' ||
+        '“' === word[input.length] && e.code === 'Quote' ||
+        '：' === word[input.length] && e.code === 'Semicolon' ||
+        '）' === word[input.length] && e.code === 'Digit0')
+    ) {
+      right = true
+      letter = word[input.length]
+    }
+    if (!e.shiftKey && (
+        '【' === word[input.length] && e.code === 'BracketLeft' ||
+        '、' === word[input.length] && e.code === 'Slash' ||
+        '。' === word[input.length] && e.code === 'Period' ||
+        '，' === word[input.length] && e.code === 'Comma' ||
+        '‘' === word[input.length] && e.code === 'Quote' ||
+        '；' === word[input.length] && e.code === 'Semicolon' ||
+        '【' === word[input.length] && e.code === 'BracketLeft' ||
+        '】' === word[input.length] && e.code === 'BracketRight'
+    )) {
+      right = true
+      letter = word[input.length]
+    }
+    console.log('e', e, e.code, e.shiftKey, word[input.length])
+
     if (right) {
       input += letter
       wrong = ''
@@ -386,6 +418,7 @@ function checkCursorPosition() {
     // 选中目标元素
     const cursorEl = document.querySelector(`.cursor`);
     const inputList = document.querySelectorAll(`.l`);
+    if (!typingWordRef) return;
     const typingWordRect = typingWordRef.getBoundingClientRect();
 
     if (inputList.length) {

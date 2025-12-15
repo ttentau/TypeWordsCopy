@@ -37,9 +37,15 @@ export function checkAndUpgradeSaveDict(val: any) {
       } else {
         data = val
       }
-      if (!data.version) return defaultState
+      if (!data.version) {
+        console.warn('数据缺少版本号，返回默认状态')
+        return defaultState
+      }
       let state: any = data.val
-      if (typeof state !== 'object') return defaultState
+      if (typeof state !== 'object') {
+        console.warn('数据格式无效，返回默认状态')
+        return defaultState
+      }
       state.load = false
       let version = Number(data.version)
       // console.log('state', state)
@@ -53,10 +59,29 @@ export function checkAndUpgradeSaveDict(val: any) {
         })
         return defaultState
       } else {
-        checkRiskKey(defaultState, state)
-        return defaultState
+        // 版本不匹配时，尽量保留数据而不是直接返回默认状态
+        console.warn(`数据版本不匹配: 当前版本 ${version}, 期望版本 ${SAVE_DICT_KEY.version}，尝试保留数据`)
+        try {
+          checkRiskKey(defaultState, state)
+          // 尝试保留 bookList 数据
+          if (state.word && state.word.bookList && Array.isArray(state.word.bookList)) {
+            defaultState.word.bookList = state.word.bookList.map((v: any) => {
+              return getDefaultDict(checkRiskKey(getDefaultDict(), v))
+            })
+          }
+          if (state.article && state.article.bookList && Array.isArray(state.article.bookList)) {
+            defaultState.article.bookList = state.article.bookList.map((v: any) => {
+              return getDefaultDict(checkRiskKey(getDefaultDict(), v))
+            })
+          }
+          return defaultState
+        } catch (upgradeError) {
+          console.error('数据升级失败，返回默认状态', upgradeError)
+          return defaultState
+        }
       }
     } catch (e) {
+      console.error('数据解析异常，返回默认状态', e)
       return defaultState
     }
   }

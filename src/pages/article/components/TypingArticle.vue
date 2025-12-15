@@ -648,7 +648,7 @@ const currentPractice = inject('currentPractice', [])
       @input="handleMobileInput"
     />
     <header class="mb-4">
-      <div class="title word"><span class="font-family text-3xl">{{
+      <div class="title"><span class="font-family text-3xl">{{
           store.sbook.lastLearnIndex + 1
         }}.</span>{{ props.article.title }}
       </div>
@@ -826,7 +826,7 @@ $article-lh: 2.4;
       display: inline-block !important;
     }
     .translate{
-      color:black;
+      color: var(--color-reverse-black);
     }
   }
 
