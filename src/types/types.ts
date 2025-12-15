@@ -97,7 +97,9 @@ export interface Statistics {
 export enum Sort {
     normal = 0,
     random = 1,
-    reverse = 2
+    reverse = 2,
+    reverseAll = 3,
+    randomAll = 4,
 }
 
 export enum ShortcutKey {

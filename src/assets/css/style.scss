@@ -199,7 +199,8 @@ html.dark {
   font-family: var(--font-family);
 }
 
-html, body {
+html,
+body {
   //font-size: 1px;
   padding: 0;
   margin: 0;
@@ -244,7 +245,7 @@ html, body {
   display: flex;
   flex-direction: column;
 
-  & > .page-content {
+  &>.page-content {
     padding: 10rem;
     box-sizing: border-box;
     overflow: auto;
@@ -275,10 +276,12 @@ a {
     width: .5rem;
     height: .6rem;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
     border-radius: .1rem;
   }
+
   ::-webkit-scrollbar-thumb {
     background: var(--color-scrollbar);
     border-radius: .6rem;
@@ -439,6 +442,7 @@ a {
 .center {
   @apply flex justify-center items-center;
 }
+
 .center-col {
   @extend .center;
   @apply flex-col;
@@ -499,9 +503,12 @@ a {
 }
 
 @keyframes underline {
-  0%, 100% {
+
+  0%,
+  100% {
     border-left: .1rem solid var(--color-article);
   }
+
   50% {
     border-left: .1rem solid transparent;
   }
@@ -521,4 +528,10 @@ a {
   background: transparent;
   font-size: 16px; // 防止iOS缩放
   color: transparent; // 文字透明
+}
+
+.btn-no-margin {
+  .base-button + .base-button {
+    margin-left: 0!important;
+  }
 }

@@ -48,6 +48,7 @@ const emit = defineEmits<{
   }],
   importData: [e: Event]
   exportData: []
+  sort: [type: Sort,pageNo: number,pageSize: number]
 }>()
 
 let listRef: any = $ref()
@@ -85,11 +86,6 @@ let selectAll = $computed(() => {
   return !!selectIds.length
 })
 
-let list2 = $ref([])
-onMounted(async () => {
-  list2 = await props.request({ pageNo, pageSize })
-  console.log('list2',list2)
-})
 
 function toggleSelect(item) {
   let rIndex = selectIds.findIndex(v => v === item.id)
@@ -117,12 +113,16 @@ const closeImportDialog = () => showImportDialog = false
 
 function sort(type: Sort) {
   if (type === Sort.reverse) {
-    Toast.success('已翻转排序')
-    list.value = reverse(cloneDeep(list.value))
+    emit('sort', type,pageNo,pageSize)
   }
   if (type === Sort.random) {
-    Toast.success('已随机排序')
-    list.value = shuffle(cloneDeep(list.value))
+    emit('sort', type,pageNo,pageSize)
+  }
+  if (type === Sort.reverseAll) {
+    emit('sort', type,1,total2)
+  }
+  if (type === Sort.randomAll) {
+    emit('sort', type,1,total2)
   }
   showSortDialog = false
 }
@@ -134,6 +134,7 @@ function handleBatchDel() {
 
 function handlePageNo(e) {
   pageNo = e
+  getData()
   scrollToTop()
 }
 
@@ -142,8 +143,28 @@ const s = useSlots()
 defineExpose({
   scrollToBottom,
   scrollToItem,
-  closeImportDialog
+  closeImportDialog,
+  getData
 })
+
+
+let list2 = $ref([])
+let loading2 = $ref(false)
+let total2 = $ref(0)
+
+async function getData() {
+  loading2 = true
+  let {list, total} = await props.request({ pageNo, pageSize })
+  console.log('list2',list2)
+  list2 = list
+  total2 = total
+  loading2 = false
+}
+
+onMounted(async () => {
+  getData()
+})
+
 
 defineRender(
     () => {
@@ -234,10 +255,12 @@ defineRender(
                               <div class="mini-row-title">
                                 列表顺序设置
                               </div>
-                              <div class="mini-row">
-                                <BaseButton size="small" onClick={() => sort(Sort.reverse)}>翻转
-                                </BaseButton>
-                                <BaseButton size="small" onClick={() => sort(Sort.random)}>随机</BaseButton>
+                              <div class="flex flex-col gap2 btn-no-margin">
+                                <BaseButton onClick={() => sort(Sort.reverse)}>翻转当前页</BaseButton>
+                                <BaseButton onClick={() => sort(Sort.reverseAll)}>翻转所有</BaseButton>
+                                <div class="line"></div>
+                                <BaseButton onClick={() => sort(Sort.reverse)}>随机当前页</BaseButton>
+                                <BaseButton onClick={() => sort(Sort.randomAll)}>随机所有</BaseButton>
                               </div>
                             </MiniDialog>
                           </div>
@@ -247,15 +270,15 @@ defineRender(
                 </div>
             }
             {
-              props.loading ?
+              loading2 ?
                   <div class="h-full w-full center text-4xl">
                     <IconEosIconsLoading color="gray"/>
                   </div>
-                  : currentList.length ? (
+                  : list2.length ? (
                       <>
                         <div class="flex-1 overflow-auto"
                              ref={e => listRef = e}>
-                          {currentList.map((item, index) => {
+                          {list2.map((item, index) => {
                             return (
                                 <div class="list-item-wrapper"
                                      key={item.word}
@@ -274,7 +297,7 @@ defineRender(
                                   onUpdate:page-size={(e) => pageSize = e}
                                   pageSizes={[20, 50, 100, 200]}
                                   layout="prev, pager, next"
-                                  total={props.total}/>
+                                  total={total2}/>
                             </div>
                         }
                       </>
@@ -316,6 +339,4 @@ defineRender(
     }
 )
 </script>
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>
