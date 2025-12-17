@@ -24,8 +24,10 @@ declare module 'vue' {
     ChannelIcons: typeof import('./src/components/ChannelIcons/ChannelIcons.vue')['default']
     Checkbox: typeof import('./src/components/base/checkbox/Checkbox.vue')['default']
     Close: typeof import('./src/components/icon/Close.vue')['default']
+    Collapse: typeof import('./src/components/base/Collapse.vue')['default']
     CommonSetting: typeof import('./src/components/setting/CommonSetting.vue')['default']
     ConflictNotice: typeof import('./src/components/ConflictNotice.vue')['default']
+    ConflictNoticeText: typeof import('./src/components/ConflictNoticeText.vue')['default']
     DeleteIcon: typeof import('./src/components/icon/DeleteIcon.vue')['default']
     Dialog: typeof import('./src/components/dialog/Dialog.vue')['default']
     DictGroup: typeof import('./src/components/list/DictGroup.vue')['default']
@@ -49,6 +51,7 @@ declare module 'vue' {
     IconFluentArrowClockwise20Regular: typeof import('~icons/fluent/arrow-clockwise20-regular')['default']
     IconFluentArrowDownload20Regular: typeof import('~icons/fluent/arrow-download20-regular')['default']
     IconFluentArrowLeft16Regular: typeof import('~icons/fluent/arrow-left16-regular')['default']
+    IconFluentArrowMove20Regular: typeof import('~icons/fluent/arrow-move20-regular')['default']
     IconFluentArrowRepeatAll20Regular: typeof import('~icons/fluent/arrow-repeat-all20-regular')['default']
     IconFluentArrowRight16Regular: typeof import('~icons/fluent/arrow-right16-regular')['default']
     IconFluentArrowShuffle16Regular: typeof import('~icons/fluent/arrow-shuffle16-regular')['default']
@@ -159,6 +162,7 @@ declare module 'vue' {
     WeChat: typeof import('./src/components/ChannelIcons/WeChat.vue')['default']
     WordItem: typeof import('./src/components/WordItem.vue')['default']
     WordList: typeof import('./src/components/list/WordList.vue')['default']
+    WordList2: typeof import('./src/components/list/WordList2.vue')['default']
     WordSetting: typeof import('./src/components/setting/WordSetting.vue')['default']
   }
 }

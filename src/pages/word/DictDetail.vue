@@ -468,7 +468,6 @@ function onSort(type: Sort, pageNo: number, pageSize: number) {
   }
 }
 
-
 defineRender(() => {
   return (
     <BasePage>
@@ -543,7 +542,6 @@ defineRender(() => {
                                   <DeleteIcon/>
                                 </BaseIcon>
                               </PopConfirm>
-
                             </div>
                           )
                         }}
@@ -688,7 +686,7 @@ defineRender(() => {
 }
 
 .word-list-section {
-  width: 40%;
+  width: 44%;
 }
 
 .edit-section {

@@ -1,44 +1,24 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { useSettingStore } from "@/stores/setting.ts";
-import { getAudioFileUrl, usePlayAudio } from "@/hooks/sound.ts";
 import { getShortcutKey, useEventListener } from "@/hooks/event.ts";
-import {
-  checkAndUpgradeSaveDict,
-  checkAndUpgradeSaveSetting,
-  cloneDeep,
-  loadJsLib,
-  shakeCommonDict,
-  sleep
-} from "@/utils";
-import { DefaultShortcutKeyMap, ShortcutKey, WordPracticeMode } from "@/types/types.ts";
+import { checkAndUpgradeSaveDict, checkAndUpgradeSaveSetting, cloneDeep, loadJsLib, sleep } from "@/utils";
+import { DefaultShortcutKeyMap } from "@/types/types.ts";
 import BaseButton from "@/components/BaseButton.vue";
-import VolumeIcon from "@/components/icon/VolumeIcon.vue";
 import { useBaseStore } from "@/stores/base.ts";
-import { saveAs } from "file-saver";
 import {
-  APP_NAME, APP_VERSION, EMAIL,
-  EXPORT_DATA_KEY, GITHUB, Host, LIB_JS_URL,
+  APP_NAME,
+  APP_VERSION,
+  Host,
+  LIB_JS_URL,
   LOCAL_FILE_KEY,
-  Origin,
   PracticeSaveArticleKey,
-  PracticeSaveWordKey, SAVE_DICT_KEY, SAVE_SETTING_KEY, SoundFileOptions
+  PracticeSaveWordKey
 } from "@/config/env.ts";
-import dayjs from "dayjs";
 import BasePage from "@/components/BasePage.vue";
 import Toast from '@/components/base/toast/Toast.ts'
-import { Option, Select } from "@/components/base/select";
-import Switch from "@/components/base/Switch.vue";
-import Slider from "@/components/base/Slider.vue";
-import RadioGroup from "@/components/base/radio/RadioGroup.vue";
-import Radio from "@/components/base/radio/Radio.vue";
-import InputNumber from "@/components/base/InputNumber.vue";
-import PopConfirm from "@/components/PopConfirm.vue";
-import Textarea from "@/components/base/Textarea.vue";
-import SettingItem from "@/pages/setting/SettingItem.vue";
-import { get, set } from "idb-keyval";
+import { set } from "idb-keyval";
 import { useRuntimeStore } from "@/stores/runtime.ts";
-import { useUserStore } from "@/stores/user.ts";
 import { useExport } from "@/hooks/export.ts";
 import MigrateDialog from "@/components/MigrateDialog.vue";
 import Log from "@/pages/setting/Log.vue";
