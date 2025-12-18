@@ -331,6 +331,7 @@ async function next(isTyping: boolean = true) {
       } else {
         console.log('自由模式，全完学完了')
         showStatDialog = true
+        clearInterval(timer)
         setTimeout(() => localStorage.removeItem(PracticeSaveWordKey.key), 300)
       }
     } else {
@@ -360,9 +361,9 @@ async function next(isTyping: boolean = true) {
         console.log('当前学完了，没错词', statStore.total, statStore.step, data.index)
         //学完了，这里第 7 步如果无单词，加 3 就是 9 了
         if (statStore.step >= 8) {
-          statStore.spend = Date.now() - statStore.startDate
           console.log('全完学完了')
           showStatDialog = true
+          clearInterval(timer)
           setTimeout(() => localStorage.removeItem(PracticeSaveWordKey.key), 300)
           return;
         }
@@ -451,6 +452,7 @@ function onTypeWrong() {
 }
 
 function savePracticeData() {
+  console.log('savePracticeData')
   localStorage.setItem(PracticeSaveWordKey.key, JSON.stringify({
     version: PracticeSaveWordKey.version,
     val: {
