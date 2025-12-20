@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { DictId, Sort } from '@/types/types.ts'
 
-import { detail } from '@/apis'
+import { add2MyDict, detail } from '@/apis'
 import BackIcon from '@/components/BackIcon.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
@@ -35,8 +35,9 @@ import {
 } from '@/utils'
 import { MessageBox } from '@/utils/MessageBox.tsx'
 import { nanoid } from 'nanoid'
-import { computed, onMounted, reactive, ref, shallowReactive, shallowRef, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { wordDelete } from '@/apis/words.ts'
 
 const runtimeStore = useRuntimeStore()
 const base = useBaseStore()
@@ -131,18 +132,52 @@ async function onSubmitWord() {
   })
 }
 
-function batchDel(ids: string[]) {
-  ids.map(id => {
-    let rIndex2 = allList.findIndex(v => v.id === id)
-    if (rIndex2 > -1) {
-      if (id === wordForm.id) {
-        wordForm = getDefaultFormWord()
+async function batchDel(ids: string[]) {
+  let localHandle = () => {
+    ids.map(id => {
+      let rIndex2 = allList.findIndex(v => v.id === id)
+      if (rIndex2 > -1) {
+        if (id === wordForm.id) {
+          wordForm = getDefaultFormWord()
+        }
+        allList.splice(rIndex2, 1)
       }
-      allList.splice(rIndex2, 1)
+    })
+    tableRef.value.getData()
+    syncDictInMyStudyList()
+  }
+
+  if (AppEnv.CAN_REQUEST) {
+    if (dict.custom) {
+      if (dict.sync) {
+        let res = await wordDelete(null, {
+          wordIds: ids,
+          userDictId: dict?.userDictId,
+          dictId: dict.id,
+        })
+        if (res.success) {
+          tableRef.value.getData()
+        } else {
+          return Toast.error(res.msg ?? '删除失败')
+        }
+      } else {
+        localHandle()
+      }
+    } else {
+      let r = await add2MyDict({
+        id: dict.id,
+        perDayStudyNumber: dict.perDayStudyNumber,
+        lastLearnIndex: dict.lastLearnIndex,
+        complete: dict.complete,
+      })
+      if (!r.success) return Toast.error(r.msg)
+      else {
+        dict.userDictId = r.data
+      }
     }
-  })
-  tableRef.value.getData()
-  syncDictInMyStudyList()
+  } else {
+    localHandle()
+  }
 }
 
 //把word对象的字段全转成字符串
@@ -220,12 +255,10 @@ onMounted(async () => {
       }
       if (base.word.bookList.find(book => book.id === runtimeStore.editDict.id)) {
         if (AppEnv.CAN_REQUEST) {
+          //todo 优化：这里只返回详情
           let res = await detail({ id: runtimeStore.editDict.id })
           if (res.success) {
             runtimeStore.editDict.statistics = res.data.statistics
-            if (res.data.words.length) {
-              runtimeStore.editDict.words = res.data.words
-            }
           }
         }
       }
@@ -362,12 +395,12 @@ function importData(e) {
           )
         } else {
           tableRef.value.closeImportDialog()
-              e.target.value = ''
-              importLoading = false
-              allList = runtimeStore.editDict.words
-              tableRef.value.getData()
-              syncDictInMyStudyList()
-              Toast.success('导入成功！')
+          e.target.value = ''
+          importLoading = false
+          allList = runtimeStore.editDict.words
+          tableRef.value.getData()
+          syncDictInMyStudyList()
+          Toast.success('导入成功！')
         }
       } else {
         Toast.warning('导入失败！原因：没有数据/未认别到数据')
@@ -466,17 +499,52 @@ watch(
   }
 )
 
+const dict = $computed(() => runtimeStore.editDict)
+
+//获取本地单词列表
+function getLocalList({ pageNo, pageSize, searchKey }) {
+  let list = allList
+  let total = allList.length
+  if (searchKey.trim()) {
+    list = allList.filter(v => v.word.toLowerCase().includes(searchKey.trim().toLowerCase()))
+    total = list.length
+  }
+  list = list.slice((pageNo - 1) * pageSize, (pageNo - 1) * pageSize + pageSize)
+  return { list, total }
+}
+
 async function requestList({ pageNo, pageSize, searchKey }) {
-  if (AppEnv.CAN_REQUEST) {
-  } else {
-    let list = allList
-    let total = allList.length
-    if (searchKey.trim()) {
-      list = allList.filter(v => v.word.toLowerCase().includes(searchKey.trim().toLowerCase()))
-      total = list.length
+  if (
+    !dict.custom &&
+    ![DictId.wordCollect, DictId.wordWrong, DictId.wordKnown].includes(dict.en_name || dict.id)
+  ) {
+    // 非自定义词典，直接请求json
+
+    //如果没数据则请求
+    if (!allList.length) {
+      let r = await _getDictDataByUrl(dict)
+      allList = r.words
     }
-    list = list.slice((pageNo - 1) * pageSize, (pageNo - 1) * pageSize + pageSize)
-    return { list, total }
+    return getLocalList({ pageNo, pageSize, searchKey })
+  } else {
+    // 自定义词典
+
+    //如果登录了,则请求后端数据
+    if (AppEnv.CAN_REQUEST) {
+      //todo 加上sync标记
+      if (dict.sync || true) {
+        //todo 优化：这里应该只返回列表
+        let res = await detail({ id: dict.id, pageNo, pageSize })
+        if (res.success) {
+          return { list: res.data.words, total: res.data.length }
+        }
+        return { list: [], total: 0 }
+      }
+    } else {
+      //未登录则用本地保存的数据
+      allList = dict.words
+    }
+    return getLocalList({ pageNo, pageSize, searchKey })
   }
 }
 
