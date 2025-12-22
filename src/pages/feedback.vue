@@ -7,7 +7,7 @@ import About from "@/components/About.vue";
 <template>
   <BasePage>
     <div class="center">
-      <div class="card w-2/3 center-col pb-20">
+      <div class="card-white w-2/3 center-col pb-20">
         <About/>
       </div>
     </div>

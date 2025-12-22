@@ -7,6 +7,14 @@
     <div class="log-item">
       <div class="mb-2">
         <div>
+          <div>日期：2025/12/20</div>
+          <div>内容：新增资源分享页面</div>
+        </div>
+      </div>
+    </div>
+    <div class="log-item">
+      <div class="mb-2">
+        <div>
           <div>日期：2025/12/17</div>
           <div>内容：新增帮助页面</div>
         </div>

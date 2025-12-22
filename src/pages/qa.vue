@@ -9,7 +9,7 @@ import ConflictNoticeText from '@/components/ConflictNoticeText.vue'
 <template>
   <BasePage>
     <div class="center">
-      <div class="card qa w-2/3">
+      <div class="card-white qa w-2/3">
         <div class="font-bold text-2xl mb-6">常见问题解答</div>
         <div class="list">
           <Collapse

@@ -387,6 +387,7 @@ function transferOk() {
                           :loading="importLoading">导入数据恢复</BaseButton>
               <input type="file"
                      id="import"
+                     class="w-0 h-0 opacity-0"
                      accept="application/json,.zip,application/zip"
                      @change="importData">
             </div>
