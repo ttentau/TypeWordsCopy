@@ -31,10 +31,10 @@ watch(() => model.value, (n) => {
           :footer="true"
           :padding="true"
           @ok="emit('ok',num)">
-    <div class="target-modal color-main">
+    <div class="w-120 color-main">
       <div class="flex gap-4 items-end mb-2">
         <span>随机复习：<span class="font-bold">{{ store.sdict.name }}</span></span>
-        <span class="text-3xl lh">{{ num }}</span>个单词
+        <span class="target-number">{{ num }}</span>个单词
       </div>
       <div class="flex gap-space">
         <span class="shrink-0">随机数量：</span>
@@ -45,25 +45,13 @@ watch(() => model.value, (n) => {
                 :max="store.sdict.lastLearnIndex"
                 v-model="num"/>
       </div>
+      <div class="text-right">
+        <span class="text-sm text-gray-500">只能复习已学习过的单词</span>
+      </div>
     </div>
   </Dialog>
 </template>
 
 <style scoped lang="scss">
 
-.target-modal {
-  width: 30rem;
-
-  .lh {
-    color: rgb(176, 116, 211)
-  }
-
-  .mode-item {
-    @apply w-50% border border-blue border-solid p-2 rounded-lg cursor-pointer;
-  }
-
-  .active {
-    @apply bg-blue color-white;
-  }
-}
 </style>

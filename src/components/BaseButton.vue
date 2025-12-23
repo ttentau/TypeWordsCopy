@@ -51,7 +51,7 @@ defineEmits(['click'])
   justify-content: center;
   outline: none;
   text-align: center;
-  transition: .1s;
+  transition: all .3s;
   user-select: none;
   vertical-align: middle;
   white-space: nowrap;
@@ -121,7 +121,7 @@ defineEmits(['click'])
     color: var(--color-main-text);
 
     &:hover:not(.disabled) {
-      opacity: 0.6;
+      background: var(--btn-info-hover);
     }
   }
 

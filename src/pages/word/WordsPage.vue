@@ -122,10 +122,16 @@ async function init() {
   loading = false
 }
 
-function startPractice() {
+function startPractice(practiceMode?: WordPracticeMode): void {
   if (store.sdict.id) {
     if (!store.sdict.words.length) {
-      return Toast.warning('没有单词可学习！')
+      Toast.warning('没有单词可学习！')
+      return
+    }
+    // 如果传入了独立模式，临时设置 wordPracticeMode
+    if (practiceMode !== undefined) {
+      localStorage.removeItem(PracticeSaveWordKey.key)
+      settingStore.wordPracticeMode = practiceMode
     }
     window.umami?.track('startStudyWord', {
       name: store.sdict.name,
@@ -138,6 +144,7 @@ function startPractice() {
     //把是否是第一次设置为false
     settingStore.first = false
     nav('practice-words/' + store.sdict.id, {}, { taskWords: currentStudy })
+    // 注意：不恢复 originalMode，因为练习过程中需要保持独立模式
   } else {
     window.umami?.track('no-dict')
     Toast.warning('请先选择一本词典')
@@ -381,13 +388,14 @@ let isNewHost = $ref(window.location.host === Host)
             </div>
           </template>
         </div>
-        <div class="flex items-end mt-4">
+        <div class="flex items-end mt-4 gap-4 btn-no-margin">
           <BaseButton
             size="large"
             class="flex-1"
             :disabled="!store.sdict.id"
             :loading="loading"
             @click="startPractice"
+            v-if="false"
           >
             <div class="flex items-center gap-2">
               <span class="line-height-[2]">{{ isSaveData ? '继续学习' : '开始学习' }}</span>
@@ -395,10 +403,10 @@ let isNewHost = $ref(window.location.host === Host)
             </div>
           </BaseButton>
 
-          <div v-if="false" class="w-full flex box-border cp color-white">
+          <div class="w-full flex box-border cp color-white">
             <div
-              @click="startPractice"
-              class="flex-1 rounded-l-lg center gap-2 py-1 bg-[var(--btn-primary)] hover:opacity-50"
+              @click="startPractice()"
+              class="flex-1 rounded-l-lg center gap-2 py-1 bg-[var(--btn-primary)] transition-all duration-300 hover:opacity-50"
             >
               <span class="line-height-[2]">{{ isSaveData ? '继续学习' : '开始学习' }}</span>
               <IconFluentArrowCircleRight16Regular class="text-xl" />
@@ -406,40 +414,54 @@ let isNewHost = $ref(window.location.host === Host)
 
             <div class="relative group">
               <div
-                class="w-10 rounded-r-lg h-full center bg-[var(--btn-primary)] hover:bg-gray border-solid border-2 border-l-gray border-transparent box-border"
+                class="w-10 rounded-r-lg h-full center bg-[var(--btn-primary)] hover:bg-gray border-solid border-2 border-l-gray border-transparent box-border transition-all duration-300"
               >
                 <IconFluentChevronDown20Regular />
               </div>
 
               <div
-                class="space-y-2 pt-2 absolute z-2 right-0 border rounded opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none group-hover:pointer-events-auto"
+                class="space-y-2 btn-no-margin pt-2 absolute z-2 right-0 border rounded opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none group-hover:pointer-events-auto"
               >
-                <div>
-                  <BaseButton
-                    size="large"
-                    type="orange"
-                    :loading="loading"
-                    @click="check(() => (showShufflePracticeSettingDialog = true))"
-                  >
-                    <div class="flex items-center gap-2">
-                      <span class="line-height-[2]">随机复习</span>
-                      <IconFluentArrowShuffle20Filled class="text-xl" />
-                    </div>
-                  </BaseButton>
-                </div>
-                <div>
-                  <BaseButton
-                    size="large"
-                    type="orange"
-                    :loading="loading"
-                    @click="check(() => (showShufflePracticeSettingDialog = true))"
-                  >
-                    <div class="flex items-center gap-2">
-                      <span class="line-height-[2]">重新学习</span>
-                      <IconFluentArrowShuffle20Filled class="text-xl" />
-                    </div>
-                  </BaseButton>
-                </div>
+                <BaseButton
+                  size="large"
+                  class="w-30"
+                  type="primary"
+                  @click="startPractice(WordPracticeMode.FollowWriteOnly)"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="line-height-[2]">跟写</span>
+                  </div>
+                </BaseButton>
+                <BaseButton
+                  size="large"
+                  class="w-30"
+                  type="primary"
+                  @click="startPractice(WordPracticeMode.IdentifyOnly)"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="line-height-[2]">自测</span>
+                  </div>
+                </BaseButton>
+                <BaseButton
+                  size="large"
+                  class="w-30"
+                  type="primary"
+                  @click="startPractice(WordPracticeMode.ListenOnly)"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="line-height-[2]">听写</span>
+                  </div>
+                </BaseButton>
+                <BaseButton
+                  size="large"
+                  class="w-30"
+                  type="primary"
+                  @click="startPractice(WordPracticeMode.DictationOnly)"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="line-height-[2]">默写</span>
+                  </div>
+                </BaseButton>
               </div>
             </div>
           </div>
@@ -447,13 +469,24 @@ let isNewHost = $ref(window.location.host === Host)
           <BaseButton
             v-if="store.sdict.id && store.sdict.lastLearnIndex"
             size="large"
-            type="orange"
             :loading="loading"
             @click="check(() => (showShufflePracticeSettingDialog = true))"
           >
             <div class="flex items-center gap-2">
               <span class="line-height-[2]">随机复习</span>
               <IconFluentArrowShuffle20Filled class="text-xl" />
+            </div>
+          </BaseButton>
+
+          <BaseButton
+            v-if="store.sdict.id && store.sdict.lastLearnIndex"
+            size="large"
+            :loading="loading"
+            @click="check(() => (showShufflePracticeSettingDialog = true))"
+          >
+            <div class="flex items-center gap-2">
+              <span class="line-height-[2]">自由练习</span>
+              <IconStreamlineColorPenDrawFlat class="text-xl" />
             </div>
           </BaseButton>
         </div>

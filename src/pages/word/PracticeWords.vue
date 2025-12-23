@@ -79,6 +79,8 @@ let data = $ref<PracticeData>({
   excludeWords: [],
 })
 let isTypingWrongWord = ref(false)
+// 独立模式的当前单词列表阶段：'new' | 'review' | 'write' | 'finished'
+let currentWordListStage = $ref<'new' | 'review' | 'write' | 'finished'>('new')
 
 provide('isTypingWrongWord', isTypingWrongWord)
 provide('practiceData', data)
@@ -209,8 +211,52 @@ function initData(initVal: TaskWords, init: boolean = false) {
     // taskWords = initVal
     //不能直接赋值，会导致 inject 的数据为默认值
     taskWords = Object.assign(taskWords, initVal)
-    //如果 shuffle 数组不为空，就说明是复习
-    if (taskWords.shuffle.length === 0) {
+    
+    // 检查是否为独立模式
+    const isStandaloneMode = settingStore.wordPracticeMode >= WordPracticeMode.DictationOnly
+    
+    if (isStandaloneMode) {
+      // 独立模式：根据模式设置对应的练习类型
+      switch (settingStore.wordPracticeMode) {
+        case WordPracticeMode.DictationOnly:
+          settingStore.wordPracticeType = WordPracticeType.Dictation
+          break
+        case WordPracticeMode.ListenOnly:
+          settingStore.wordPracticeType = WordPracticeType.Listen
+          break
+        case WordPracticeMode.IdentifyOnly:
+          settingStore.wordPracticeType = WordPracticeType.Identify
+          break
+        case WordPracticeMode.FollowWriteOnly:
+          settingStore.wordPracticeType = WordPracticeType.FollowWrite
+          break
+      }
+      
+      // 独立模式：按优先级选择起始单词列表（新词 -> 复习上次 -> 复习之前）
+      let selectedWords: Word[] = []
+      if (taskWords.new.length > 0) {
+        currentWordListStage = 'new'
+        selectedWords = taskWords.new
+      } else if (taskWords.review.length > 0) {
+        currentWordListStage = 'review'
+        selectedWords = taskWords.review
+      } else if (taskWords.write.length > 0) {
+        currentWordListStage = 'write'
+        selectedWords = taskWords.write
+      } else {
+        Toast.warning('没有可学习的单词！')
+        router.push('/word')
+        return
+      }
+      
+      data.words = selectedWords
+      statStore.step = 0 // 独立模式不使用 step 逻辑
+      statStore.total = taskWords.review.length + taskWords.new.length + taskWords.write.length
+      statStore.newWordNumber = taskWords.new.length
+      statStore.reviewWordNumber = taskWords.review.length
+      statStore.writeWordNumber = taskWords.write.length
+    } else if (taskWords.shuffle.length === 0) {
+      // 原有的智能模式逻辑
       if (taskWords.new.length === 0) {
         if (taskWords.review.length) {
           settingStore.wordPracticeType = WordPracticeType.Identify
@@ -277,6 +323,7 @@ const nextWord: Word = $computed(() => {
 watch(
     () => settingStore.wordPracticeType,
     n => {
+      // Free 模式不自动设置，System 模式和独立模式都需要设置
       if (settingStore.wordPracticeMode === WordPracticeMode.Free) return
       switch (n) {
         case WordPracticeType.Spell:
@@ -359,6 +406,59 @@ async function next(isTyping: boolean = true) {
         showStatDialog = true
         clearInterval(timer)
         setTimeout(() => localStorage.removeItem(PracticeSaveWordKey.key), 300)
+      }
+    } else {
+      data.index++
+    }
+  } else if (settingStore.wordPracticeMode >= WordPracticeMode.DictationOnly) {
+    // 独立模式
+    if (data.index === data.words.length - 1) {
+      // 处理错词
+      data.wrongWords = data.wrongWords.filter(v => (!data.excludeWords.includes(v.word)))
+      if (data.wrongWords.length) {
+        isTypingWrongWord.value = true
+        console.log('当前学完了，但还有错词')
+        data.words = shuffle(cloneDeep(data.wrongWords))
+        data.index = 0
+        data.wrongWords = []
+      } else {
+        isTypingWrongWord.value = false
+        // 按顺序切换到下一个单词列表：新词 -> 复习上次 -> 复习之前 -> 结束
+        let nextWords: Word[] = []
+        let nextStage: 'new' | 'review' | 'write' | 'finished' = 'finished'
+        
+        if (currentWordListStage === 'new') {
+          // 新词完成，切换到复习上次
+          if (taskWords.review.length > 0) {
+            nextWords = taskWords.review
+            nextStage = 'review'
+          } else if (taskWords.write.length > 0) {
+            // 如果没有复习上次，直接跳到复习之前
+            nextWords = taskWords.write
+            nextStage = 'write'
+          }
+        } else if (currentWordListStage === 'review') {
+          // 复习上次完成，切换到复习之前
+          if (taskWords.write.length > 0) {
+            nextWords = taskWords.write
+            nextStage = 'write'
+          }
+        }
+        // currentWordListStage === 'write' 时，nextStage 保持为 'finished'
+        
+        if (nextStage === 'finished') {
+          // 全部完成
+          console.log('独立模式，全完学完了')
+          showStatDialog = true
+          clearInterval(timer)
+          setTimeout(() => localStorage.removeItem(PracticeSaveWordKey.key), 300)
+        } else {
+          // 切换到下一个阶段
+          currentWordListStage = nextStage
+          data.words = nextWords
+          data.index = 0
+          // 保持相同的练习类型
+        }
       }
     } else {
       data.index++

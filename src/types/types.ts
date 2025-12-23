@@ -226,7 +226,11 @@ export enum PracticeArticleWordType {
 //练习模式
 export enum WordPracticeMode {
     System = 0,
-    Free = 1
+    Free = 1,
+    DictationOnly = 2,  // 独立默写模式
+    ListenOnly = 3,      // 独立听写模式
+    IdentifyOnly = 4,    // 独立自测模式
+    FollowWriteOnly = 5  // 独立跟写模式（内部会自动切换到 Spell）
 }
 
 //练习类型

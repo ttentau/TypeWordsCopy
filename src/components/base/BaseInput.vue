@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {defineComponent, ref, useAttrs, watch, computed} from 'vue';
+import {ref, useAttrs, watch, computed} from 'vue';
 import Close from "@/components/icon/Close.vue";
 import {useDisableEventListener} from "@/hooks/event.ts";
 

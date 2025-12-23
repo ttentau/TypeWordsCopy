@@ -52,6 +52,7 @@
 
   --btn-primary: rgb(75, 85, 99);
   --btn-info: white;
+  --btn-info-hover: #eaeaea;
 
   --color-primary: #E6E8EB;
   --color-second: rgb(247, 247, 247);
@@ -119,7 +120,8 @@ html.dark {
   --color-sub-gray: #383737;
   --color-scrollbar: rgb(92, 93, 94);
 
-  --btn-info: transparent;
+  --btn-info: #1b1b1b;
+  --btn-info-hover: #3a3a3a;
 
   --color-input-color: white;
   --color-input-bg: rgba(14, 18, 23, 1);
@@ -535,4 +537,9 @@ a {
   .base-button + .base-button {
     margin-left: 0 !important;
   }
+}
+
+.target-number {
+  @apply text-3xl! mx-2;
+  color: rgb(176, 116, 211)!important;
 }
