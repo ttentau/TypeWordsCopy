@@ -19,7 +19,7 @@ export const ENV = Object.assign(map['DEV'], common)
 
 export let AppEnv = {
   TOKEN: localStorage.getItem('token') ?? '',
-  IS_OFFICIAL: true,
+  IS_OFFICIAL: false,
   IS_LOGIN: false,
   CAN_REQUEST: false,
 }
@@ -92,6 +92,7 @@ export const TourConfig = {
   total: 7,
 }
 
+export const IS_DEV = import.meta.env.MODE === 'development'
 export const LIB_JS_URL = {
   SHEPHERD:
     import.meta.env.MODE === 'development'

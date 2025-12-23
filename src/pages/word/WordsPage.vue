@@ -130,6 +130,7 @@ function startPractice(practiceMode?: WordPracticeMode): void {
     }
     // 如果传入了独立模式，临时设置 wordPracticeMode
     if (practiceMode !== undefined) {
+      //todo 临时处理
       localStorage.removeItem(PracticeSaveWordKey.key)
       settingStore.wordPracticeMode = practiceMode
     }
@@ -377,16 +378,14 @@ let isNewHost = $ref(window.location.host === Host)
             <div class="num">{{ currentStudy.new.length }}</div>
             <div class="txt">新词数</div>
           </div>
-          <template v-if="settingStore.wordPracticeMode === WordPracticeMode.System">
-            <div class="stat">
-              <div class="num">{{ currentStudy.review.length }}</div>
-              <div class="txt">复习上次</div>
-            </div>
-            <div class="stat">
-              <div class="num">{{ currentStudy.write.length }}</div>
-              <div class="txt">复习之前</div>
-            </div>
-          </template>
+          <div class="stat">
+            <div class="num">{{ currentStudy.review.length }}</div>
+            <div class="txt">复习上次</div>
+          </div>
+          <div class="stat">
+            <div class="num">{{ currentStudy.write.length }}</div>
+            <div class="txt">复习之前</div>
+          </div>
         </div>
         <div class="flex items-end mt-4 gap-4 btn-no-margin">
           <BaseButton
@@ -422,6 +421,16 @@ let isNewHost = $ref(window.location.host === Host)
               <div
                 class="space-y-2 btn-no-margin pt-2 absolute z-2 right-0 border rounded opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none group-hover:pointer-events-auto"
               >
+                <BaseButton
+                  size="large"
+                  class="w-30"
+                  type="primary"
+                  @click="startPractice(WordPracticeMode.System)"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="line-height-[2]">智能</span>
+                  </div>
+                </BaseButton>
                 <BaseButton
                   size="large"
                   class="w-30"
@@ -467,7 +476,6 @@ let isNewHost = $ref(window.location.host === Host)
           </div>
 
           <BaseButton
-            v-if="store.sdict.id && store.sdict.lastLearnIndex"
             size="large"
             :loading="loading"
             @click="check(() => (showShufflePracticeSettingDialog = true))"
@@ -479,10 +487,9 @@ let isNewHost = $ref(window.location.host === Host)
           </BaseButton>
 
           <BaseButton
-            v-if="store.sdict.id && store.sdict.lastLearnIndex"
             size="large"
             :loading="loading"
-            @click="check(() => (showShufflePracticeSettingDialog = true))"
+            @click="startPractice(WordPracticeMode.Free)"
           >
             <div class="flex items-center gap-2">
               <span class="line-height-[2]">自由练习</span>

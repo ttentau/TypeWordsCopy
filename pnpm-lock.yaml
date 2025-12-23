@@ -108,6 +108,9 @@ importers:
       '@iconify-json/streamline':
         specifier: ^1.2.5
         version: 1.2.5
+      '@iconify-json/streamline-color':
+        specifier: ^1.2.2
+        version: 1.2.2
       '@iconify-json/system-uicons':
         specifier: ^1.2.4
         version: 1.2.4
@@ -570,6 +573,9 @@ packages:
 
   '@iconify-json/simple-icons@1.2.48':
     resolution: {integrity: sha512-EACOtZMoPJtERiAbX1De0asrrCtlwI27+03c9OJlYWsly9w1O5vcD8rTzh+kDPjo+K8FOVnq2Qy+h/CzljSKDA==}
+
+  '@iconify-json/streamline-color@1.2.2':
+    resolution: {integrity: sha512-+ypc4kzeKTFbHVM2uNWFqt1iR7E4XeMTI3Wa3LcmeHLPjyk6u6e9NJqqOHUU02rpA8GaN80XHySXzX+4DuZbzA==}
 
   '@iconify-json/streamline@1.2.5':
     resolution: {integrity: sha512-u6l9BOJoIIPjjDXWl6D/hPDzeBk5WiaEHZ+U9SbkQ14N9hgotaYyIZVMfgF175CG1TTS06j8k15D3FM2OYaFIw==}
@@ -4260,6 +4266,10 @@ snapshots:
       '@iconify/types': 2.0.0
 
   '@iconify-json/simple-icons@1.2.48':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/streamline-color@1.2.2':
     dependencies:
       '@iconify/types': 2.0.0
 

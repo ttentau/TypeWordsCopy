@@ -2,7 +2,7 @@
 import { inject, Ref } from 'vue'
 import { usePracticeStore } from '@/stores/practice.ts'
 import { useSettingStore } from '@/stores/setting.ts'
-import { PracticeData, ShortcutKey } from '@/types/types.ts'
+import { PracticeData, ShortcutKey, WordPracticeStage } from '@/types/types.ts'
 import BaseIcon from '@/components/BaseIcon.vue'
 import Tooltip from '@/components/base/Tooltip.vue'
 import Progress from '@/components/base/Progress.vue'
@@ -35,43 +35,52 @@ function format(val: number, suffix: string = '', check: number = -1) {
 
 const status = $computed(() => {
   if (isTypingWrongWord.value) return '复习错词'
-  return getStepStr(statStore.step)
+  return getStageStr(statStore.stage)
 })
 
-function getStepStr(step: number) {
+function getStageStr(stage: WordPracticeStage) {
   let str = ''
-  switch (step) {
-    case 0:
-      str += `学习新词`
+  switch (stage) {
+    case WordPracticeStage.FollowWriteNewWord:
+      str += `跟写新词`
       break
-    case 1:
+    case WordPracticeStage.IdentifyNewWord:
+      str += `自测新词`
+      break
+    case WordPracticeStage.ListenNewWord:
       str += `听写新词`
       break
-    case 2:
+    case WordPracticeStage.DictationNewWord:
       str += `默写新词`
       break
-    case 3:
+    case WordPracticeStage.FollowWriteReview:
+      str += `跟写上次学习`
+      break
+    case WordPracticeStage.IdentifyReview:
       str += `自测上次学习`
       break
-    case 4:
-      str += '听写上次学习'
+    case WordPracticeStage.ListenReview:
+      str += `听写上次学习`
       break
-    case 5:
-      str += '默写上次学习'
+    case WordPracticeStage.DictationReview:
+      str += `默写上次学习`
       break
-    case 6:
+    case WordPracticeStage.FollowWriteReviewAll:
+      str += '跟写之前学习'
+      break
+    case WordPracticeStage.IdentifyReviewAll:
       str += '自测之前学习'
       break
-    case 7:
+    case WordPracticeStage.ListenReviewAll:
       str += '听写之前学习'
       break
-    case 8:
+    case WordPracticeStage.DictationReviewAll:
       str += '默写之前学习'
       break
-    case 9:
+    case WordPracticeStage.Complete:
       str += '学习完成'
       break
-    case 10:
+    case WordPracticeStage.Shuffle:
       str += '随机复习'
       break
   }
@@ -128,31 +137,31 @@ const progress = $computed(() => {
           <BaseIcon
             v-if="statStore.step < 9"
             @click="emit('skipStep')"
-            :title="`跳到下一阶段:${getStepStr(statStore.step + 1)}`"
+            :title="`跳到下一阶段:${getStageStr(statStore.stage + 1)}`"
           >
             <IconFluentArrowRight16Regular />
           </BaseIcon>
 
           <div class="relative z-999 group">
             <div
-              class="space-y-2 btn-no-margin pb-2 left-1/2 -transform-translate-x-1/2 absolute z-999 bottom-full border rounded scale-95 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-150 pointer-events-none group-hover:pointer-events-auto"
+              class="space-y-2 btn-no-margin pb-2 left-1/2 -transform-translate-x-1/2 absolute z-999 bottom-full scale-95 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300  pointer-events-none group-hover:pointer-events-auto"
             >
-              <BaseButton size="large" type="info" class="w-full" @click="$emit('toggleSimple')">
+              <BaseButton size="normal" type="info" class="w-full" @click="$emit('toggleSimple')">
                 <div class="flex items-center gap-2">
-                  <IconFluentCheckmarkCircle16Regular v-if="!isSimple" class="text-xl" />
-                  <IconFluentCheckmarkCircle16Filled v-else class="text-xl" />
+                  <IconFluentCheckmarkCircle16Regular v-if="!isSimple" />
+                  <IconFluentCheckmarkCircle16Filled v-else />
                   <span>
                     {{
-                      (!isSimple ? '标记为已掌握' : '取消标记已掌握') +
+                      (!isSimple ? '标记已掌握' : '取消已掌握') +
                       `(${settingStore.shortcutKeyMap[ShortcutKey.ToggleSimple]})`
                     }}</span
                   >
                 </div>
               </BaseButton>
-              <BaseButton size="large" type="info" class="w-full" @click="$emit('toggleCollect')">
+              <BaseButton size="normal" type="info" class="w-full" @click="$emit('toggleCollect')">
                 <div class="flex items-center gap-2">
-                  <IconFluentStarAdd16Regular v-if="!isCollect" class="text-xl" />
-                  <IconFluentStar16Filled v-else class="text-xl" />
+                  <IconFluentStarAdd16Regular v-if="!isCollect" />
+                  <IconFluentStar16Filled v-else />
                   <span>
                     {{
                       (!isCollect ? '收藏' : '取消收藏') +
@@ -161,17 +170,15 @@ const progress = $computed(() => {
                   >
                 </div>
               </BaseButton>
-              <BaseButton size="large" type="info" class="w-full" @click="$emit('skip')">
+              <BaseButton size="normal" type="info" class="w-full" @click="$emit('skip')">
                 <div class="flex items-center gap-2">
-                  <IconFluentArrowBounce20Regular class="transform-rotate-180 text-xl" />
-                  <span>
-                    跳过当前单词({{ settingStore.shortcutKeyMap[ShortcutKey.Next] }})</span
-                  >
+                  <IconFluentArrowBounce20Regular class="transform-rotate-180" />
+                  <span> 跳过单词({{ settingStore.shortcutKeyMap[ShortcutKey.Next] }})</span>
                 </div>
               </BaseButton>
             </div>
 
-            <BaseIcon @click="emit('skip')">
+            <BaseIcon>
               <IconPhMicrosoftWordLogoLight />
             </BaseIcon>
           </div>
