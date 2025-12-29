@@ -1,16 +1,5 @@
 <script setup lang="ts">
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  provide,
-  ref,
-  useAttrs,
-  useSlots,
-  VNode,
-  watch,
-} from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useSlots, VNode, watch } from 'vue'
 import { useWindowClick } from '@/hooks/event.ts'
 
 interface Option {
@@ -26,8 +15,7 @@ const props = defineProps<{
   options?: Option[]
 }>()
 
-const emit = defineEmits(['update:modelValue'])
-const attrs = useAttrs()
+const emit = defineEmits(['update:modelValue', 'toggle'])
 
 const isOpen = ref(false)
 const isReverse = ref(false)
@@ -69,6 +57,7 @@ const toggleDropdown = async () => {
   if (props.disabled) return
 
   isOpen.value = !isOpen.value
+  emit('toggle', isOpen.value)
 
   if (isOpen.value) {
     await nextTick()
@@ -81,6 +70,7 @@ const selectOption = (value: any, label: string) => {
   selectedOption.value = { value, label }
   emit('update:modelValue', value)
   isOpen.value = false
+  emit('toggle', isOpen.value)
 }
 
 let selectValue = ref(props.modelValue)
@@ -97,6 +87,7 @@ useWindowClick((e: PointerEvent) => {
     !dropdownRef.value.contains(e.target as Node)
   ) {
     isOpen.value = false
+    emit('toggle', isOpen.value)
   }
 })
 
@@ -158,26 +149,15 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="select" ref="selectRef">
-    <div
-      class="select__wrapper"
-      :class="{ disabled: disabled, active: isOpen }"
-      @click="toggleDropdown"
-    >
+    <div class="select__wrapper" :class="{ disabled: disabled, active: isOpen }" @click="toggleDropdown">
       <div class="select__label" :class="{ 'is-placeholder': !selectedOption }">
         {{ displayValue }}
       </div>
-      <IconFluentChevronLeft20Filled
-        class="select__arrow"
-        :class="{ 'is-reverse': isOpen }"
-        width="16"
-      />
+      <IconFluentChevronLeft20Filled class="select__arrow" :class="{ 'is-reverse': isOpen }" width="16" />
     </div>
 
     <teleport to="body">
-      <transition
-        :name="isReverse ? 'zoom-in-bottom' : 'zoom-in-top'"
-        :key="isReverse ? 'bottom' : 'top'"
-      >
+      <transition :name="isReverse ? 'zoom-in-bottom' : 'zoom-in-top'" :key="isReverse ? 'bottom' : 'top'">
         <div class="select__dropdown" v-if="isOpen" ref="dropdownRef" :style="dropdownStyle">
           <slot></slot>
         </div>
@@ -237,9 +217,8 @@ onBeforeUnmount(() => {
 .select__dropdown {
   max-height: 200px;
   overflow-y: auto;
-  background-color: var(--color-third);
-  border-radius: 0.25rem;
-  @apply shadow-lg;
+  background-color: var(--color-card-bg);
+  @apply shadow-xl rounded-lg border border-gray-300 border-solid;
 }
 
 /* 往下展开的动画 */

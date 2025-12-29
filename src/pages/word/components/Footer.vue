@@ -18,6 +18,8 @@ import Progress from '@/components/base/Progress.vue'
 import SettingDialog from '@/components/setting/SettingDialog.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import { useBaseStore } from '@/stores/base.ts'
+import VolumeSettingMiniDialog from '@/pages/word/components/VolumeSettingMiniDialog.vue'
+import StageProgress from '@/components/StageProgress.vue'
 
 const statStore = usePracticeStore()
 const store = useBaseStore()
@@ -238,6 +240,9 @@ const stages = $computed(() => {
         </div>
         <div class="flex gap-2 justify-center items-center" id="toolbar-icons">
           <SettingDialog type="word" />
+
+          <VolumeSettingMiniDialog/>
+
           <BaseIcon
             v-if="settingStore.wordPracticeMode !== WordPracticeMode.Free"
             @click="emit('skipStep')"

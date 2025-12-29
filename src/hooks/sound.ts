@@ -13,6 +13,7 @@ export function useSound(audioSrcList?: string[], audioFileLength?: number) {
     if (audioSrcList) setAudio(audioSrcList, audioFileLength)
   })
 
+  //这里同一个音频弄好几份是为了快速打字是，可同时发音
   function setAudio(audioSrcList2: string[], audioFileLength2?: number) {
     if (audioFileLength2) audioLength = audioFileLength2
     audioList = []
@@ -23,6 +24,7 @@ export function useSound(audioSrcList?: string[], audioFileLength?: number) {
   }
 
   function play(volume: number = 100) {
+    console.log('play',audioList)
     index++
     if (audioList.length > 1 && audioList.length !== audioLength) {
       audioList[index % audioList.length].volume = volume / 100
@@ -46,7 +48,7 @@ export function usePlayKeyboardAudio() {
       settingStore.keyboardSoundFile = '机械键盘2'
     }
     let urlList = getAudioFileUrl(settingStore.keyboardSoundFile)
-    setAudio(urlList, urlList.length === 1 ? 3 : 1)
+    setAudio(urlList, urlList.length === 1 ? 4 : 1)
   })
 
   function playAudio() {

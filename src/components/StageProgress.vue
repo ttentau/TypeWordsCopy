@@ -1,8 +1,8 @@
 <template>
-  <div class="flex gap-5 w-full h-4">
+  <div class="flex gap-5 w-full h-3">
     <template v-for="i of props.stages">
       <template v-if="i?.children?.length && i.active">
-        <div class="flex gap-1 h-4" :style="{ width: i.ratio + '%' }">
+        <div class="flex gap-1" :style="{ width: i.ratio + '%' }">
           <template v-for="j of i.children">
             <Tooltip :title="j.name">
               <Progress

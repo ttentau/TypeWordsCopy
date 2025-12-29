@@ -39,6 +39,7 @@
   "devDependencies": {
     "@alicloud/pop-core": "^1.8.0",
     "@iconify-json/bx": "^1.2.2",
+    "@iconify-json/clarity": "^1.2.4",
     "@iconify-json/dinkie-icons": "^1.2.0",
     "@iconify-json/eos-icons": "^1.2.4",
     "@iconify-json/fluent": "^1.2.28",

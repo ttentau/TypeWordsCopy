@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, provide, ref, watch } from 'vue'
 
-import Statistics from '@/pages/word/Statistics.vue'
+import Statistics from '@/pages/word/components/Statistics.vue'
 import { emitter, EventKey, useEvents } from '@/utils/eventBus.ts'
 import { useSettingStore } from '@/stores/setting.ts'
 import { useRuntimeStore } from '@/stores/runtime.ts'
