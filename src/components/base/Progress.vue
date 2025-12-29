@@ -7,6 +7,7 @@ interface IProps {
   textInside?: boolean;
   strokeWidth?: number;
   color?: string;
+  active?: boolean;
   format?: (percentage: number) => string;
   size?: 'normal' | 'large';
 }
@@ -16,6 +17,7 @@ const props = withDefaults(defineProps<IProps>(), {
   textInside: false,
   strokeWidth: 6,
   color: '#409eff',
+  active: true,
   format: (percentage) => `${percentage}%`,
   size: 'normal',
 });
@@ -31,6 +33,7 @@ const trackStyle = computed(() => {
   const height = props.size === 'large' ? props.strokeWidth * 2.5 : props.strokeWidth;
   return {
     height: `${height}px`,
+    opacity: props.active ? 1 : 0.4,
   };
 });
 

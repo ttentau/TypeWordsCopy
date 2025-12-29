@@ -4,7 +4,6 @@ import {onMounted, onUnmounted} from "vue";
 export const emitter = mitt()
 export const EventKey = {
   resetWord: 'resetWord',
-  changeDict: 'changeDict',
   openStatModal: 'openStatModal',
   openWordListModal: 'openWordListModal',
   closeOther: 'closeOther',

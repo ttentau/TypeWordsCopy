@@ -5,8 +5,11 @@ import { useSettingStore } from '@/stores/setting.ts'
 import {
   PracticeData,
   ShortcutKey,
+  TaskWords,
   WordPracticeMode,
+  WordPracticeModeNameMap,
   WordPracticeModeStageMap,
+  WordPracticeStage,
   WordPracticeStageNameMap,
 } from '@/types/types.ts'
 import BaseIcon from '@/components/BaseIcon.vue'
@@ -36,6 +39,7 @@ const emit = defineEmits<{
 
 let practiceData = inject<PracticeData>('practiceData')
 let isTypingWrongWord = inject<Ref<boolean>>('isTypingWrongWord')
+let practiceTaskWords = inject<TaskWords>('practiceTaskWords')
 
 function format(val: number, suffix: string = '', check: number = -1) {
   return val === check ? '-' : val + suffix
@@ -51,6 +55,147 @@ const progress = $computed(() => {
   if (!practiceData.words.length) return 0
   return (practiceData.index / practiceData.words.length) * 100
 })
+
+const stages = $computed(() => {
+  let DEFAULT_BAR = {
+    name: '',
+    ratio: 100,
+    percentage: (practiceData.index / practiceData.words.length) * 100,
+    active: true,
+  }
+  if ([WordPracticeMode.Shuffle, WordPracticeMode.Free].includes(settingStore.wordPracticeMode)) {
+    return [DEFAULT_BAR]
+  } else {
+    // 阶段映射：将 WordPracticeStage 映射到 stageIndex 和 childIndex
+    const stageMap: Partial<Record<WordPracticeStage, { stageIndex: number; childIndex: number }>> = {
+      [WordPracticeStage.FollowWriteNewWord]: { stageIndex: 0, childIndex: 0 },
+      [WordPracticeStage.IdentifyNewWord]: { stageIndex: 0, childIndex: 0 },
+      [WordPracticeStage.ListenNewWord]: { stageIndex: 0, childIndex: 1 },
+      [WordPracticeStage.DictationNewWord]: { stageIndex: 0, childIndex: 2 },
+      [WordPracticeStage.IdentifyReview]: { stageIndex: 1, childIndex: 0 },
+      [WordPracticeStage.ListenReview]: { stageIndex: 1, childIndex: 1 },
+      [WordPracticeStage.DictationReview]: { stageIndex: 1, childIndex: 2 },
+      [WordPracticeStage.IdentifyReviewAll]: { stageIndex: 2, childIndex: 0 },
+      [WordPracticeStage.ListenReviewAll]: { stageIndex: 2, childIndex: 1 },
+      [WordPracticeStage.DictationReviewAll]: { stageIndex: 2, childIndex: 2 },
+    }
+
+    // 获取当前阶段的配置
+    const currentStageConfig = stageMap[statStore.stage]
+    if (!currentStageConfig) {
+      return stages
+    }
+
+    const { stageIndex, childIndex } = currentStageConfig
+    const currentProgress = (practiceData.index / practiceData.words.length) * 100
+
+    if (
+      [WordPracticeMode.IdentifyOnly, WordPracticeMode.DictationOnly, WordPracticeMode.ListenOnly].includes(
+        settingStore.wordPracticeMode
+      )
+    ) {
+      const stages = [
+        { name: `新词：${WordPracticeModeNameMap[settingStore.wordPracticeMode]}`, ratio: 33, percentage: 0, active: false },
+        { name: `上次学习：${WordPracticeModeNameMap[settingStore.wordPracticeMode]}`, ratio: 33, percentage: 0, active: false },
+        { name: `之前学习：${WordPracticeModeNameMap[settingStore.wordPracticeMode]}`, ratio: 33, percentage: 0, active: false },
+      ]
+
+      // 设置已完成阶段的百分比和比例
+      for (let i = 0; i < stageIndex; i++) {
+        stages[i].percentage = 100
+        stages[i].ratio = 33
+      }
+
+      // 设置当前激活的阶段
+      stages[stageIndex].active = true
+      stages[stageIndex].percentage = (practiceData.index / practiceData.words.length) * 100
+
+      return stages
+    } else {
+      // 阶段配置：定义每个阶段组的基础信息
+      const stageConfigs = [
+        {
+          name: '新词',
+          ratio: 70,
+          children: [{ name: '新词：跟写' }, { name: '新词：听写' }, { name: '新词：默写' }],
+        },
+        {
+          name: '上次学习：复习',
+          ratio: 15,
+          children: [{ name: '上次学习：自测' }, { name: '上次学习：听写' }, { name: '上次学习：默写' }],
+        },
+        {
+          name: '之前学习：复习',
+          ratio: 15,
+          children: [{ name: '之前学习：自测' }, { name: '之前学习：听写' }, { name: '之前学习：默写' }],
+        },
+      ]
+
+      // 初始化 stages
+      const stages = stageConfigs.map(config => ({
+        name: config.name,
+        percentage: 0,
+        ratio: config.ratio,
+        active: false,
+        children: config.children.map(child => ({
+          name: child.name,
+          percentage: 0,
+          ratio: 33,
+          active: false,
+        })),
+      }))
+
+      // 设置已完成阶段的百分比和比例
+      for (let i = 0; i < stageIndex; i++) {
+        stages[i].percentage = 100
+        stages[i].ratio = 15
+      }
+
+      // 设置当前激活的阶段
+      stages[stageIndex].ratio = 70
+      stages[stageIndex].active = true
+
+      // 根据类型设置子阶段的进度
+      const currentStageChildren = stages[stageIndex].children
+
+      if (childIndex === 0) {
+        // 跟写/自测：只激活第一个子阶段
+        currentStageChildren[0].active = true
+        currentStageChildren[0].percentage = currentProgress
+      } else if (childIndex === 1) {
+        // 听写：第一个完成，第三个未开始，第二个进行中
+        currentStageChildren[0].active = false
+        currentStageChildren[1].active = true
+        currentStageChildren[2].active = false
+        currentStageChildren[0].percentage = 100
+        currentStageChildren[1].percentage = currentProgress
+        currentStageChildren[2].percentage = 0
+      } else if (childIndex === 2) {
+        // 默写：前两个完成，第三个进行中
+        currentStageChildren[0].active = false
+        currentStageChildren[1].active = false
+        currentStageChildren[2].active = true
+        currentStageChildren[0].percentage = 100
+        currentStageChildren[1].percentage = 100
+        currentStageChildren[2].percentage = currentProgress
+      }
+
+      if (settingStore.wordPracticeMode === WordPracticeMode.System) {
+        return stages
+      }
+      if (settingStore.wordPracticeMode === WordPracticeMode.Review) {
+        stages.shift()
+        if (stageIndex === 1) stages[1].ratio = 30
+        if (stageIndex === 2) stages[0].ratio = 30
+
+        console.log('stages', stages, childIndex)
+
+        return stages
+      }
+    }
+  }
+  return [DEFAULT_BAR]
+})
 </script>
 
 <template>
@@ -65,14 +210,7 @@ const progress = $computed(() => {
     </Tooltip>
 
     <div class="bottom">
-      <div class="flex gap-1">
-        <Tooltip
-          :title="WordPracticeStageNameMap[i]"
-          v-for="i of WordPracticeModeStageMap[settingStore.wordPracticeMode]"
-        >
-          <Progress :percentage="progress" :stroke-width="8" color="#69b1ff" :show-text="false" />
-        </Tooltip>
-      </div>
+      <StageProgress :stages="stages" />
 
       <div class="flex justify-between items-center">
         <div class="stat">
@@ -130,8 +268,7 @@ const progress = $computed(() => {
                   <IconFluentStar16Filled v-else />
                   <span>
                     {{
-                      (!isCollect ? '收藏' : '取消收藏') +
-                      `(${settingStore.shortcutKeyMap[ShortcutKey.ToggleCollect]})`
+                      (!isCollect ? '收藏' : '取消收藏') + `(${settingStore.shortcutKeyMap[ShortcutKey.ToggleCollect]})`
                     }}</span
                   >
                 </div>

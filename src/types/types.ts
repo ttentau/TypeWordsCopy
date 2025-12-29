@@ -230,9 +230,8 @@ export enum WordPracticeMode {
   IdentifyOnly = 2, // 独立自测模式
   DictationOnly = 3, // 独立默写模式
   ListenOnly = 4, // 独立听写模式
-  FollowWriteOnly = 5, // 独立跟写模式（内部会自动切换到 Spell）
-  Shuffle = 6, // 随机复习模式
-  Review = 7, // 复习模式
+  Shuffle = 5, // 随机复习模式
+  Review = 6, // 复习模式
 }
 
 //练习类型
@@ -282,12 +281,6 @@ export enum WordPracticeStage {
 
 export const WordPracticeModeStageMap: Record<WordPracticeMode, WordPracticeStage[]> = {
   [WordPracticeMode.Free]: [WordPracticeStage.FollowWriteNewWord, WordPracticeStage.Complete],
-  [WordPracticeMode.FollowWriteOnly]: [
-    WordPracticeStage.FollowWriteNewWord,
-    WordPracticeStage.FollowWriteReview,
-    WordPracticeStage.FollowWriteReviewAll,
-    WordPracticeStage.Complete,
-  ],
   [WordPracticeMode.IdentifyOnly]: [
     WordPracticeStage.IdentifyNewWord,
     WordPracticeStage.IdentifyReview,
@@ -356,7 +349,6 @@ export const WordPracticeModeNameMap: Record<WordPracticeMode, string> = {
   [WordPracticeMode.IdentifyOnly]: '自测',
   [WordPracticeMode.DictationOnly]: '默写',
   [WordPracticeMode.ListenOnly]: '听写',
-  [WordPracticeMode.FollowWriteOnly]: '跟写',
   [WordPracticeMode.Shuffle]: '随机复习',
   [WordPracticeMode.Review]: '复习',
 }

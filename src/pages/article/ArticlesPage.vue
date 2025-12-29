@@ -1,7 +1,19 @@
 <script setup lang="ts">
-import { useBaseStore } from "@/stores/base.ts";
-import { useRouter } from "vue-router";
-import BasePage from "@/components/BasePage.vue";
+import { myDictList } from '@/apis'
+import Progress from '@/components/base/Progress.vue'
+import Toast from '@/components/base/toast/Toast.ts'
+import BaseButton from '@/components/BaseButton.vue'
+import BaseIcon from '@/components/BaseIcon.vue'
+import BasePage from '@/components/BasePage.vue'
+import Book from '@/components/Book.vue'
+import DeleteIcon from '@/components/icon/DeleteIcon.vue'
+import PopConfirm from '@/components/PopConfirm.vue'
+import { AppEnv, DICT_LIST, Host, LIB_JS_URL, TourConfig } from '@/config/env.ts'
+import { useBaseStore } from '@/stores/base.ts'
+import { useRuntimeStore } from '@/stores/runtime.ts'
+import { useSettingStore } from '@/stores/setting.ts'
+import { getDefaultDict } from '@/types/func.ts'
+import { DictResource, DictType } from '@/types/types.ts'
 import {
   _getDictDataByUrl,
   _nextTick,
@@ -10,32 +22,20 @@ import {
   msToHourMinute,
   resourceWrap,
   total,
-  useNav
-} from "@/utils";
-import { DictResource, DictType } from "@/types/types.ts";
-import { useRuntimeStore } from "@/stores/runtime.ts";
-import BaseIcon from "@/components/BaseIcon.vue";
-import Book from "@/components/Book.vue";
-import Progress from '@/components/base/Progress.vue';
-import Toast from '@/components/base/toast/Toast.ts'
-import BaseButton from "@/components/BaseButton.vue";
-import PopConfirm from "@/components/PopConfirm.vue";
-import { watch } from "vue";
-import { getDefaultDict } from "@/types/func.ts";
-import DeleteIcon from "@/components/icon/DeleteIcon.vue";
-import dayjs from "dayjs";
-import isBetween from "dayjs/plugin/isBetween";
+  useNav,
+} from '@/utils'
+import { getPracticeArticleCache } from '@/utils/cache.ts'
+import { useFetch } from '@vueuse/core'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
 import isoWeek from 'dayjs/plugin/isoWeek'
-import { useFetch } from "@vueuse/core";
-import { AppEnv, DICT_LIST, Host, LIB_JS_URL, TourConfig } from "@/config/env.ts";
-import { myDictList } from "@/apis";
-import { useSettingStore } from "@/stores/setting.ts";
-import {PRACTICE_ARTICLE_CACHE} from "@/utils/cache.ts";
+import { watch } from 'vue'
+import { useRouter } from 'vue-router'
 
 dayjs.extend(isoWeek)
-dayjs.extend(isBetween);
+dayjs.extend(isBetween)
 
-const {nav} = useNav()
+const { nav } = useNav()
 const base = useBaseStore()
 const store = useBaseStore()
 const settingStore = useSettingStore()
@@ -43,76 +43,73 @@ const router = useRouter()
 const runtimeStore = useRuntimeStore()
 let isSaveData = $ref(false)
 
-watch(() => store.load, n => {
-  if (n) init()
-}, {immediate: true})
+watch(
+  () => store.load,
+  n => {
+    if (n) init()
+  },
+  { immediate: true }
+)
 
 async function init() {
   if (AppEnv.CAN_REQUEST) {
-    let res = await myDictList({type: "article"})
+    let res = await myDictList({ type: 'article' })
     if (res.success) {
       store.setState(Object.assign(store.$state, res.data))
     }
   }
   if (store.article.studyIndex >= 1) {
     if (!store.sbook.custom && !store.sbook.articles.length) {
-      store.article.bookList[store.article.studyIndex] = await _getDictDataByUrl(store.sbook, DictType.article)
+      store.article.bookList[store.article.studyIndex] = await _getDictDataByUrl(
+        store.sbook,
+        DictType.article
+      )
     }
   }
-  let d = localStorage.getItem(PRACTICE_ARTICLE_CACHE.key)
+  let d = getPracticeArticleCache()
   if (d) {
-    try {
-      let obj = JSON.parse(d)
-      let data = obj.val
-      //如果全是0，说明未进行练习，直接重置
-      if (
-        data.practiceData.sectionIndex === 0 &&
-        data.practiceData.sentenceIndex === 0 &&
-        data.practiceData.wordIndex === 0
-      ) {
-        throw new Error()
-      }
-      isSaveData = true
-    } catch (e) {
-      localStorage.removeItem(PRACTICE_ARTICLE_CACHE.key)
-    }
+    isSaveData = true
   }
 }
 
-watch(() => store?.sbook?.id, (n) => {
-  console.log('n', n)
-  if (!n) {
-    _nextTick(async () => {
-      const Shepherd = await loadJsLib('Shepherd', LIB_JS_URL.SHEPHERD);
-      const tour = new Shepherd.Tour(TourConfig);
-      tour.on('cancel', () => {
-        localStorage.setItem('tour-guide', '1');
-      });
-      tour.addStep({
-        id: 'step7',
-        text: '点击这里选择一本书籍开始学习，步骤前面选词典相同，让我们跳过中间步骤，直接开始练习吧',
-        attachTo: {
-          element: '#no-book',
-          on: 'bottom'
-        },
-        buttons: [
-          {
-            text: `下一步（7/${TourConfig.total}）`,
-            action() {
-              tour.next()
-              nav('/practice-articles/article_nce2', {guide: 1})
-            }
-          }
-        ]
-      });
+watch(
+  () => store?.sbook?.id,
+  n => {
+    console.log('n', n)
+    if (!n) {
+      _nextTick(async () => {
+        const Shepherd = await loadJsLib('Shepherd', LIB_JS_URL.SHEPHERD)
+        const tour = new Shepherd.Tour(TourConfig)
+        tour.on('cancel', () => {
+          localStorage.setItem('tour-guide', '1')
+        })
+        tour.addStep({
+          id: 'step7',
+          text: '点击这里选择一本书籍开始学习，步骤前面选词典相同，让我们跳过中间步骤，直接开始练习吧',
+          attachTo: {
+            element: '#no-book',
+            on: 'bottom',
+          },
+          buttons: [
+            {
+              text: `下一步（7/${TourConfig.total}）`,
+              action() {
+                tour.next()
+                nav('/practice-articles/article_nce2', { guide: 1 })
+              },
+            },
+          ],
+        })
 
-      const r = localStorage.getItem('tour-guide');
-      if (settingStore.first && !r && !isMobile()) {
-        tour.start();
-      }
-    }, 500)
-  }
-}, {immediate: true})
+        const r = localStorage.getItem('tour-guide')
+        if (settingStore.first && !r && !isMobile()) {
+          tour.start()
+        }
+      }, 500)
+    }
+  },
+  { immediate: true }
+)
 
 function startStudy() {
   // console.log(store.sbook.articles[1])
@@ -126,7 +123,7 @@ function startStudy() {
       name: base.sbook.name,
       custom: base.sbook.custom,
       complete: base.sbook.complete,
-      s:`name:${base.sbook.name},index:${base.sbook.lastLearnIndex},title:${base.sbook.articles[base.sbook.lastLearnIndex].title}`,
+      s: `name:${base.sbook.name},index:${base.sbook.lastLearnIndex},title:${base.sbook.articles[base.sbook.lastLearnIndex].title}`,
     })
     nav('/practice-articles/' + store.sbook.id)
   } else {
@@ -152,7 +149,7 @@ function handleBatchDel() {
     }
   })
   selectIds = []
-  Toast.success("删除成功！")
+  Toast.success('删除成功！')
 }
 
 function toggleSelect(item) {
@@ -177,7 +174,12 @@ const totalSpend = $computed(() => {
 })
 const todayTotalSpend = $computed(() => {
   if (base.sbook.statistics?.length) {
-    return msToHourMinute(total(base.sbook.statistics.filter(v => dayjs(v.startDate).isSame(dayjs(), 'day')), 'spend'))
+    return msToHourMinute(
+      total(
+        base.sbook.statistics.filter(v => dayjs(v.startDate).isSame(dayjs(), 'day')),
+        'spend'
+      )
+    )
   }
   return 0
 })
@@ -190,40 +192,42 @@ const totalDay = $computed(() => {
 })
 
 const weekList = $computed(() => {
-  const list = Array(7).fill(false);
+  const list = Array(7).fill(false)
 
   // 获取本周的起止时间
-  const startOfWeek = dayjs().startOf('isoWeek'); // 周一
-  const endOfWeek = dayjs().endOf('isoWeek');     // 周日
+  const startOfWeek = dayjs().startOf('isoWeek') // 周一
+  const endOfWeek = dayjs().endOf('isoWeek') // 周日
 
   store.sbook.statistics?.forEach(item => {
-    const date = dayjs(item.startDate);
+    const date = dayjs(item.startDate)
     if (date.isBetween(startOfWeek, endOfWeek, null, '[]')) {
-      let idx = date.day();
+      let idx = date.day()
       // dayjs().day() 0=周日, 1=周一, ..., 6=周六
       // 需要转换为 0=周一, ..., 6=周日
       if (idx === 0) {
-        idx = 6; // 周日放到最后
+        idx = 6 // 周日放到最后
       } else {
-        idx = idx - 1; // 其余前移一位
+        idx = idx - 1 // 其余前移一位
       }
-      list[idx] = true;
+      list[idx] = true
     }
-  });
+  })
   return list
 })
 
-const {data: recommendBookList, isFetching} = useFetch(resourceWrap(DICT_LIST.ARTICLE.RECOMMENDED)).json()
+const { data: recommendBookList, isFetching } = useFetch(
+  resourceWrap(DICT_LIST.ARTICLE.RECOMMENDED)
+).json()
 
 let isNewHost = $ref(window.location.host === Host)
-
 </script>
 
 <template>
   <BasePage>
     <div class="mb-4" v-if="!isNewHost">
-      新域名已启用，后续请访问 <a href="https://typewords.cc/words?from_old_site=1">https://typewords.cc</a>。当前
-      2study.top 域名将在不久后停止使用
+      新域名已启用，后续请访问
+      <a href="https://typewords.cc/words?from_old_site=1">https://typewords.cc</a>。当前 2study.top
+      域名将在不久后停止使用
     </div>
 
     <div class="card flex flex-col md:flex-row justify-between gap-space p-4 md:p-6">
@@ -234,10 +238,9 @@ let isNewHost = $ref(window.location.host === Host)
           quantifier="篇"
           :item="base.sbook"
           :show-progress="false"
-          @click="goBookDetail(base.sbook)"/>
-        <Book v-else
-              :is-add="true"
-              @click="router.push('/book-list')"/>
+          @click="goBookDetail(base.sbook)"
+        />
+        <Book v-else :is-add="true" @click="router.push('/book-list')" />
       </div>
       <div class="flex-1">
         <div class="flex justify-between items-start">
@@ -249,7 +252,8 @@ let isNewHost = $ref(window.location.host === Host)
                 :class="item ? 'bg-[#409eff] color-white' : 'bg-gray-200'"
                 v-for="(item, i) in weekList"
                 :key="i"
-              >{{ i + 1 }}
+              >
+                {{ i + 1 }}
               </div>
             </div>
           </div>
@@ -259,67 +263,92 @@ let isNewHost = $ref(window.location.host === Host)
         </div>
         <div class="flex flex-col sm:flex-row gap-3 items-center mt-3 gap-space w-full">
           <div
-            class="w-full sm:flex-1 rounded-xl p-4 box-border relative bg-[var(--bg-history)] border border-gray-200">
+            class="w-full sm:flex-1 rounded-xl p-4 box-border relative bg-[var(--bg-history)] border border-gray-200"
+          >
             <div class="text-[#409eff] text-xl font-bold">{{ todayTotalSpend }}</div>
             <div class="text-gray-500">今日学习时长</div>
           </div>
           <div
-            class="w-full sm:flex-1 rounded-xl p-4 box-border relative bg-[var(--bg-history)] border border-gray-200">
+            class="w-full sm:flex-1 rounded-xl p-4 box-border relative bg-[var(--bg-history)] border border-gray-200"
+          >
             <div class="text-[#409eff] text-xl font-bold">{{ totalDay }}</div>
             <div class="text-gray-500">总学习天数</div>
           </div>
           <div
-            class="w-full sm:flex-1 rounded-xl p-4 box-border relative bg-[var(--bg-history)] border border-gray-200">
+            class="w-full sm:flex-1 rounded-xl p-4 box-border relative bg-[var(--bg-history)] border border-gray-200"
+          >
             <div class="text-[#409eff] text-xl font-bold">{{ totalSpend }}</div>
             <div class="text-gray-500">总学习时长</div>
           </div>
         </div>
         <div class="flex gap-3 mt-3">
-          <Progress class="w-full md:w-auto"
-                    size="large"
-                    :percentage="base.currentBookProgress"
-                    :format="()=> `${ base.sbook?.lastLearnIndex || 0 }/${base.sbook?.length || 0}篇`"
-                    :show-text="true"></Progress>
+          <Progress
+            class="w-full md:w-auto"
+            size="large"
+            :percentage="base.currentBookProgress"
+            :format="() => `${base.sbook?.lastLearnIndex || 0}/${base.sbook?.length || 0}篇`"
+            :show-text="true"
+          ></Progress>
 
-          <BaseButton size="large" class="w-full md:w-auto"
-                      @click="startStudy"
-                      :disabled="!base.sbook.name">
+          <BaseButton
+            size="large"
+            class="w-full md:w-auto"
+            @click="startStudy"
+            :disabled="!base.sbook.name"
+          >
             <div class="flex items-center gap-2 justify-center w-full">
               <span class="line-height-[2]">{{ isSaveData ? '继续学习' : '开始学习' }}</span>
-              <IconFluentArrowCircleRight16Regular class="text-xl"/>
+              <IconFluentArrowCircleRight16Regular class="text-xl" />
             </div>
           </BaseButton>
         </div>
       </div>
     </div>
 
-    <div class="card  flex flex-col">
+    <div class="card flex flex-col">
       <div class="flex justify-between">
         <div class="title">我的书籍</div>
         <div class="flex gap-4 items-center">
-          <PopConfirm title="确认删除所有选中书籍？" @confirm="handleBatchDel" v-if="selectIds.length">
+          <PopConfirm
+            title="确认删除所有选中书籍？"
+            @confirm="handleBatchDel"
+            v-if="selectIds.length"
+          >
             <BaseIcon class="del" title="删除">
-              <DeleteIcon/>
+              <DeleteIcon />
             </BaseIcon>
           </PopConfirm>
 
-          <div class="color-link cursor-pointer" v-if="base.article.bookList.length > 1"
-               @click="isMultiple = !isMultiple; selectIds = []">{{ isMultiple ? '取消' : '管理书籍' }}
+          <div
+            class="color-link cursor-pointer"
+            v-if="base.article.bookList.length > 1"
+            @click="
+             () => {
+              isMultiple = !isMultiple
+              selectIds = []
+             }
+            "
+          >
+            {{ isMultiple ? '取消' : '管理书籍' }}
           </div>
-          <div class="color-link cursor-pointer" @click="nav('book-detail', { isAdd: true })">创建个人书籍</div>
+          <div class="color-link cursor-pointer" @click="nav('book-detail', { isAdd: true })">
+            创建个人书籍
+          </div>
         </div>
       </div>
       <div class="flex gap-4 flex-wrap mt-4">
-        <Book :is-add="false"
-              :is-user="true"
-              quantifier="篇"
-              :item="item"
-              :checked="selectIds.includes(item.id)"
-              @check="() => toggleSelect(item)"
-              :show-checkbox="isMultiple && j >= 1"
-              v-for="(item, j) in base.article.bookList"
-              @click="goBookDetail(item)"/>
-        <Book :is-add="true" @click="router.push('/book-list')"/>
+        <Book
+          :is-add="false"
+          :is-user="true"
+          quantifier="篇"
+          :item="item"
+          :checked="selectIds.includes(item.id)"
+          @check="() => toggleSelect(item)"
+          :show-checkbox="isMultiple && j >= 1"
+          v-for="(item, j) in base.article.bookList"
+          @click="goBookDetail(item)"
+        />
+        <Book :is-add="true" @click="router.push('/book-list')" />
       </div>
     </div>
 
@@ -331,11 +360,14 @@ let isNewHost = $ref(window.location.host === Host)
         </div>
       </div>
 
-      <div class="flex gap-4 flex-wrap  mt-4">
-        <Book :is-add="false"
-              quantifier="篇"
-              :item="item as any"
-              v-for="(item, j) in recommendBookList" @click="goBookDetail(item as any)"/>
+      <div class="flex gap-4 flex-wrap mt-4">
+        <Book
+          :is-add="false"
+          quantifier="篇"
+          :item="item as any"
+          v-for="(item, j) in recommendBookList"
+          @click="goBookDetail(item as any)"
+        />
       </div>
     </div>
   </BasePage>

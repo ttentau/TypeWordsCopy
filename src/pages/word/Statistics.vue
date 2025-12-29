@@ -242,7 +242,7 @@ calcWeekList() // 新增：计算本周学习记录
         <ChannelIcons />
       </div>
       <!-- Action Buttons -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="flex min-w-130 justify-center">
         <BaseButton
           :keyboard="settingStore.shortcutKeyMap[ShortcutKey.RepeatChapter]"
           @click="options(EventKey.repeatStudy)"
@@ -253,6 +253,7 @@ calcWeekList() // 新增：计算本周学习记录
           </div>
         </BaseButton>
         <BaseButton
+          v-if="settingStore.wordPracticeMode !== WordPracticeMode.Review"
           :keyboard="settingStore.shortcutKeyMap[ShortcutKey.NextChapter]"
           @click="options(EventKey.continueStudy)"
         >
@@ -263,6 +264,7 @@ calcWeekList() // 新增：计算本周学习记录
         </BaseButton>
         <!--        todo 感觉这里的继续默写有问题，应该是当前组，而不是下一组-->
         <BaseButton
+          v-if="settingStore.wordPracticeMode !== WordPracticeMode.Review"
           :keyboard="settingStore.shortcutKeyMap[ShortcutKey.NextRandomWrite]"
           @click="options(EventKey.randomWrite)"
         >

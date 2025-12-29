@@ -285,7 +285,7 @@ async function onTyping(e: KeyboardEvent) {
       right = true
       letter = word[input.length]
     }
-    console.log('e', e, e.code, e.shiftKey, word[input.length])
+    // console.log('e', e, e.code, e.shiftKey, word[input.length])
 
     if (right) {
       input += letter

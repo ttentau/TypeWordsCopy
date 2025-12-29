@@ -1,10 +1,9 @@
 <script setup lang="ts">
 
-import {Origin} from "@/config/env.ts";
-import BaseButton from "@/components/BaseButton.vue";
-import {set} from 'idb-keyval'
-import {defineAsyncComponent} from "vue";
 import Toast from "@/components/base/toast/Toast.ts";
+import { Origin } from "@/config/env.ts";
+import { set } from 'idb-keyval';
+import { defineAsyncComponent } from "vue";
 
 const Dialog = defineAsyncComponent(() => import('@/components/dialog/Dialog.vue'))
 

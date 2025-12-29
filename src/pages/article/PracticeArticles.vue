@@ -1,8 +1,30 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, provide, watch } from 'vue'
+import { addStat, setUserDictProp } from '@/apis'
+import Toast from '@/components/base/toast/Toast.ts'
+import Tooltip from '@/components/base/Tooltip.vue'
+import BaseIcon from '@/components/BaseIcon.vue'
+import ConflictNotice from '@/components/ConflictNotice.vue'
+import ArticleList from '@/components/list/ArticleList.vue'
+import Panel from '@/components/Panel.vue'
+import PracticeLayout from '@/components/PracticeLayout.vue'
+import SettingDialog from '@/components/setting/SettingDialog.vue'
+import { AppEnv, DICT_LIST, LIB_JS_URL, TourConfig } from '@/config/env.ts'
+import { genArticleSectionData, usePlaySentenceAudio } from '@/hooks/article.ts'
+import { useArticleOptions } from '@/hooks/dict.ts'
+import {
+  useDisableEventListener,
+  useOnKeyboardEventListener,
+  useStartKeyboardEventListener,
+} from '@/hooks/event.ts'
+import useTheme from '@/hooks/theme.ts'
+import ArticleAudio from '@/pages/article/components/ArticleAudio.vue'
+import EditSingleArticleModal from '@/pages/article/components/EditSingleArticleModal.vue'
+import TypingArticle from '@/pages/article/components/TypingArticle.vue'
 import { useBaseStore } from '@/stores/base.ts'
-import { emitter, EventKey, useEvents } from '@/utils/eventBus.ts'
+import { usePracticeStore } from '@/stores/practice.ts'
+import { useRuntimeStore } from '@/stores/runtime.ts'
 import { useSettingStore } from '@/stores/setting.ts'
+import { getDefaultArticle, getDefaultDict, getDefaultWord } from '@/types/func.ts'
 import {
   Article,
   ArticleItem,
@@ -15,13 +37,6 @@ import {
   Word,
 } from '@/types/types.ts'
 import {
-  useDisableEventListener,
-  useOnKeyboardEventListener,
-  useStartKeyboardEventListener,
-} from '@/hooks/event.ts'
-import useTheme from '@/hooks/theme.ts'
-import Toast from '@/components/base/toast/Toast.ts'
-import {
   _getDictDataByUrl,
   _nextTick,
   cloneDeep,
@@ -31,25 +46,10 @@ import {
   resourceWrap,
   total,
 } from '@/utils'
-import { usePracticeStore } from '@/stores/practice.ts'
-import { useArticleOptions } from '@/hooks/dict.ts'
-import { genArticleSectionData, usePlaySentenceAudio } from '@/hooks/article.ts'
-import { getDefaultArticle, getDefaultDict, getDefaultWord } from '@/types/func.ts'
-import TypingArticle from '@/pages/article/components/TypingArticle.vue'
-import BaseIcon from '@/components/BaseIcon.vue'
-import Panel from '@/components/Panel.vue'
-import ArticleList from '@/components/list/ArticleList.vue'
-import EditSingleArticleModal from '@/pages/article/components/EditSingleArticleModal.vue'
-import Tooltip from '@/components/base/Tooltip.vue'
-import ConflictNotice from '@/components/ConflictNotice.vue'
+import { getPracticeArticleCache, setPracticeArticleCache } from '@/utils/cache.ts'
+import { emitter, EventKey, useEvents } from '@/utils/eventBus.ts'
+import { computed, onMounted, onUnmounted, provide, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import PracticeLayout from '@/components/PracticeLayout.vue'
-import ArticleAudio from '@/pages/article/components/ArticleAudio.vue'
-import { AppEnv, DICT_LIST, LIB_JS_URL, TourConfig } from '@/config/env.ts'
-import { addStat, setUserDictProp } from '@/apis'
-import { useRuntimeStore } from '@/stores/runtime.ts'
-import SettingDialog from '@/components/setting/SettingDialog.vue'
-import { PRACTICE_ARTICLE_CACHE } from '@/utils/cache.ts'
 
 const store = useBaseStore()
 const runtimeStore = useRuntimeStore()
@@ -70,6 +70,7 @@ let editArticle = $ref<Article>(getDefaultArticle())
 let audioRef = $ref<HTMLAudioElement>()
 let timer = $ref(0)
 let isFocus = true
+let isTyped = $ref(false)
 
 function write() {
   // console.log('write')
@@ -107,6 +108,7 @@ function toggleConciseMode() {
 }
 
 function next() {
+  setPracticeArticleCache(null)
   if (store.sbook.lastLearnIndex >= articleData.list.length - 1) {
     store.sbook.complete = true
     store.sbook.lastLearnIndex = 0
@@ -228,7 +230,6 @@ onMounted(() => {
   } else {
     loading = true
   }
-
   if (route.query.guide) {
     showConflictNotice = false
   } else {
@@ -238,60 +239,17 @@ onMounted(() => {
 
 onUnmounted(() => {
   runtimeStore.disableEventListener = false
+  let cache = getPracticeArticleCache()
+  //如果有缓存，则更新花费的时间；因为用户不输入不会保存数据
+  if (cache) {
+    cache.statStoreData.spend = statStore.spend
+    setPracticeArticleCache(cache)
+  }
   clearInterval(timer)
-  savePracticeData(true, false)
 })
 
 useStartKeyboardEventListener()
 useDisableEventListener(() => loading)
-
-function savePracticeData(init = true, regenerate = true) {
-  let d = localStorage.getItem(PRACTICE_ARTICLE_CACHE.key)
-  if (d) {
-    try {
-      let obj = JSON.parse(d)
-      if (obj.val.practiceData.id !== articleData.article.id) {
-        throw new Error()
-      }
-      if (init) {
-        let data = obj.val
-        //如果全是0，说明未进行练习，直接重置
-        if (
-          data.practiceData.sectionIndex === 0 &&
-          data.practiceData.sentenceIndex === 0 &&
-          data.practiceData.wordIndex === 0
-        ) {
-          throw new Error()
-        }
-        //初始化时spend为0，把本地保存的值设置给statStore里面，再保存，保持一致。不然每次进来都是0
-        statStore.$patch(data.statStoreData)
-      }
-
-      obj.val.statStoreData = statStore.$state
-      localStorage.setItem(PRACTICE_ARTICLE_CACHE.key, JSON.stringify(obj))
-    } catch (e) {
-      localStorage.removeItem(PRACTICE_ARTICLE_CACHE.key)
-      regenerate && savePracticeData()
-    }
-  } else {
-    localStorage.setItem(
-      PRACTICE_ARTICLE_CACHE.key,
-      JSON.stringify({
-        version: PRACTICE_ARTICLE_CACHE.version,
-        val: {
-          practiceData: {
-            sectionIndex: 0,
-            sentenceIndex: 0,
-            wordIndex: 0,
-            stringIndex: 0,
-            id: articleData.article.id,
-          },
-          statStoreData: statStore.$state,
-        },
-      })
-    )
-  }
-}
 
 function setArticle(val: Article) {
   statStore.wrong = 0
@@ -312,12 +270,11 @@ function setArticle(val: Article) {
     })
   })
 
-  savePracticeData()
+  isTyped = false
   clearInterval(timer)
   timer = setInterval(() => {
     if (isFocus) {
       statStore.spend += 1000
-      savePracticeData(false)
     }
   }, 1000)
 
@@ -326,8 +283,9 @@ function setArticle(val: Article) {
 
 async function complete() {
   clearInterval(timer)
+  //延时删除缓存，因为可能还有输入，需要保存
   setTimeout(() => {
-    localStorage.removeItem(PRACTICE_ARTICLE_CACHE.key)
+    setPracticeArticleCache(null)
   }, 1500)
 
   //todo 有空了改成实时保存
@@ -432,6 +390,7 @@ function nextWord(word: ArticleWord) {
 }
 
 async function changeArticle(val: ArticleItem) {
+  setPracticeArticleCache(null)
   let rIndex = articleData.list.findIndex(v => v.id === val.item.id)
   if (rIndex > -1) {
     store.sbook.lastLearnIndex = rIndex
@@ -585,7 +544,8 @@ provide('currentPractice', currentPractice)
                 <div class="name">记录</div>
               </div>
               <div class="row">
-                <div class="num">{{ Math.floor(statStore.spend / 1000 / 60) }}分钟</div>
+                <div class="num">{{statStore.spend }}分钟</div>
+                <!-- <div class="num">{{ Math.floor(statStore.spend / 1000 / 60) }}分钟</div> -->
                 <div class="line"></div>
                 <div class="name">时间</div>
               </div>
