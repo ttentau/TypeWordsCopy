@@ -1,34 +1,31 @@
 <script setup lang="ts">
-
-import BasePage from "@/components/BasePage.vue";
-import BackIcon from "@/components/BackIcon.vue";
-import Empty from "@/components/Empty.vue";
-import ArticleList from "@/components/list/ArticleList.vue";
-import { useBaseStore } from "@/stores/base.ts";
-import { Article, Dict, DictId, DictType } from "@/types/types.ts";
-import { useRuntimeStore } from "@/stores/runtime.ts";
-import BaseButton from "@/components/BaseButton.vue";
-import { useRoute, useRouter } from "vue-router";
-import EditBook from "@/pages/article/components/EditBook.vue";
-import { computed, onMounted } from "vue";
-import { _dateFormat, _getDictDataByUrl, msToHourMinute, resourceWrap, total, useNav } from "@/utils";
-import BaseIcon from "@/components/BaseIcon.vue";
-import { useArticleOptions } from "@/hooks/dict.ts";
-import { getDefaultArticle, getDefaultDict } from "@/types/func.ts";
-import Toast from "@/components/base/toast/Toast.ts";
-import ArticleAudio from "@/pages/article/components/ArticleAudio.vue";
-import { MessageBox } from "@/utils/MessageBox.tsx";
-import { useSettingStore } from "@/stores/setting.ts";
-import { useFetch } from "@vueuse/core";
-import { AppEnv, DICT_LIST } from "@/config/env.ts";
-import { detail } from "@/apis";
+import BasePage from '@/components/BasePage.vue'
+import BackIcon from '@/components/BackIcon.vue'
+import Empty from '@/components/Empty.vue'
+import ArticleList from '@/components/list/ArticleList.vue'
+import { useBaseStore } from '@/stores/base.ts'
+import { Article, Dict, DictId, DictType } from '@/types/types.ts'
+import { useRuntimeStore } from '@/stores/runtime.ts'
+import BaseButton from '@/components/BaseButton.vue'
+import { useRoute, useRouter } from 'vue-router'
+import EditBook from '@/pages/article/components/EditBook.vue'
+import { computed, onMounted } from 'vue'
+import { _dateFormat, _getDictDataByUrl, msToHourMinute, resourceWrap, total, useNav } from '@/utils'
+import { getDefaultArticle, getDefaultDict } from '@/types/func.ts'
+import Toast from '@/components/base/toast/Toast.ts'
+import ArticleAudio from '@/pages/article/components/ArticleAudio.vue'
+import { MessageBox } from '@/utils/MessageBox.tsx'
+import { useSettingStore } from '@/stores/setting.ts'
+import { useFetch } from '@vueuse/core'
+import { AppEnv, DICT_LIST } from '@/config/env.ts'
+import { detail } from '@/apis'
 
 const runtimeStore = useRuntimeStore()
 const settingStore = useSettingStore()
 const base = useBaseStore()
 const router = useRouter()
 const route = useRoute()
-const {nav} = useNav()
+const { nav } = useNav()
 
 let isEdit = $ref(false)
 let isAdd = $ref(false)
@@ -65,13 +62,13 @@ async function addMyStudyList() {
     name: sbook.name,
     custom: sbook.custom,
     complete: sbook.complete,
-    s:`name:${sbook.name},index:${sbook.lastLearnIndex},title:${sbook.articles[sbook.lastLearnIndex].title}`,
+    s: `name:${sbook.name},index:${sbook.lastLearnIndex},title:${sbook.articles[sbook.lastLearnIndex].title}`,
   })
   nav('/practice-articles/' + sbook.id)
 }
 
 const showBookDetail = computed(() => {
-  return !(isAdd || isEdit);
+  return !(isAdd || isEdit)
 })
 
 async function init() {
@@ -80,12 +77,13 @@ async function init() {
     runtimeStore.editDict = getDefaultDict()
   } else {
     if (!runtimeStore.editDict.id) {
-      await router.push("/articles")
+      await router.push('/articles')
     } else {
-      if (!runtimeStore.editDict?.articles?.length
-          && !runtimeStore.editDict?.custom
-          && ![DictId.articleCollect].includes(runtimeStore.editDict.en_name || runtimeStore.editDict.id)
-          && !runtimeStore.editDict?.is_default
+      if (
+        !runtimeStore.editDict?.articles?.length &&
+        !runtimeStore.editDict?.custom &&
+        ![DictId.articleCollect].includes(runtimeStore.editDict.en_name || runtimeStore.editDict.id) &&
+        !runtimeStore.editDict?.is_default
       ) {
         loading = true
         let r = await _getDictDataByUrl(runtimeStore.editDict, DictType.article)
@@ -94,7 +92,7 @@ async function init() {
 
       if (base.article.bookList.find(book => book.id === runtimeStore.editDict.id)) {
         if (AppEnv.CAN_REQUEST) {
-          let res = await detail({id: runtimeStore.editDict.id})
+          let res = await detail({ id: runtimeStore.editDict.id })
           if (res.success) {
             runtimeStore.editDict.statistics = res.data.statistics
             if (res.data.articles.length) {
@@ -118,37 +116,32 @@ function formClose() {
   else router.back()
 }
 
-const {
-  isArticleCollect,
-  toggleArticleCollect
-} = useArticleOptions()
-
-const {data: book_list} = useFetch(resourceWrap(DICT_LIST.ARTICLE.ALL)).json()
+const { data: book_list } = useFetch(resourceWrap(DICT_LIST.ARTICLE.ALL)).json()
 
 function reset() {
   MessageBox.confirm(
-      '继续此操作会重置所有文章，并从官方书籍获取最新文章列表，学习记录不会被重置。确认恢复默认吗？',
-      '恢复默认',
-      async () => {
-        let dict = book_list.value.find(v => v.url === runtimeStore.editDict.url) as Dict
-        if (dict && dict.id) {
-          dict = await _getDictDataByUrl(dict, DictType.article)
-          let rIndex = base.article.bookList.findIndex(v => v.id === runtimeStore.editDict.id)
-          if (rIndex > -1) {
-            let item = base.article.bookList[rIndex]
-            item.custom = false
-            item.id = dict.id
-            item.articles = dict.articles
-            if (item.lastLearnIndex >= item.articles.length) {
-              item.lastLearnIndex = item.articles.length - 1
-            }
-            runtimeStore.editDict = item
-            Toast.success('恢复成功')
-            return
+    '继续此操作会重置所有文章，并从官方书籍获取最新文章列表，学习记录不会被重置。确认恢复默认吗？',
+    '恢复默认',
+    async () => {
+      let dict = book_list.value.find(v => v.url === runtimeStore.editDict.url) as Dict
+      if (dict && dict.id) {
+        dict = await _getDictDataByUrl(dict, DictType.article)
+        let rIndex = base.article.bookList.findIndex(v => v.id === runtimeStore.editDict.id)
+        if (rIndex > -1) {
+          let item = base.article.bookList[rIndex]
+          item.custom = false
+          item.id = dict.id
+          item.articles = dict.articles
+          if (item.lastLearnIndex >= item.articles.length) {
+            item.lastLearnIndex = item.articles.length - 1
           }
+          runtimeStore.editDict = item
+          Toast.success('恢复成功')
+          return
         }
-        Toast.error('恢复失败')
       }
+      Toast.error('恢复失败')
+    }
   )
 }
 
@@ -181,38 +174,36 @@ function next() {
   <BasePage>
     <div class="card mb-0 dict-detail-card flex flex-col" v-if="showBookDetail">
       <div class="dict-header flex justify-between items-center relative">
-        <BackIcon class="dict-back z-2"/>
+        <BackIcon class="dict-back z-2" />
         <div class="dict-title absolute text-2xl text-align-center w-full">{{ runtimeStore.editDict.name }}</div>
         <div class="dict-actions flex">
           <BaseButton v-if="runtimeStore.editDict.custom && runtimeStore.editDict.url" type="info" @click="reset">
             恢复默认
           </BaseButton>
-          <BaseButton :loading="studyLoading||loading" type="info" @click="isEdit = true">编辑</BaseButton>
+          <BaseButton :loading="studyLoading || loading" type="info" @click="isEdit = true">编辑</BaseButton>
           <BaseButton type="info" @click="router.push('batch-edit-article')">文章管理</BaseButton>
-          <BaseButton :loading="studyLoading||loading" @click="addMyStudyList">学习</BaseButton>
+          <BaseButton :loading="studyLoading || loading" @click="addMyStudyList">学习</BaseButton>
         </div>
       </div>
       <div class="flex gap-4 mt-2">
-        <img :src="runtimeStore.editDict?.cover"
-             class="w-30 rounded-md"
-             v-if="runtimeStore.editDict?.cover"
-             alt="">
+        <img :src="runtimeStore.editDict?.cover" class="w-30 rounded-md" v-if="runtimeStore.editDict?.cover" alt="" />
         <div class="text-lg">介绍：{{ runtimeStore.editDict.description }}</div>
       </div>
-      <div class="text-base  " v-if="totalSpend">总学习时长：{{ totalSpend }}</div>
+      <div class="text-base" v-if="totalSpend">总学习时长：{{ totalSpend }}</div>
 
       <div class="line my-3"></div>
 
       <div class="flex flex-1 overflow-hidden">
         <div class="left flex-[2] scroll p-0">
           <ArticleList
-              v-if="runtimeStore.editDict.length"
-              @title="handleCheckedChange"
-              @click="handleCheckedChange"
-              :list="runtimeStore.editDict.articles"
-              :active-id="selectArticle.id">
+            v-if="runtimeStore.editDict.length"
+            @title="handleCheckedChange"
+            @click="handleCheckedChange"
+            :list="runtimeStore.editDict.articles"
+            :active-id="selectArticle.id"
+          >
           </ArticleList>
-          <Empty v-else/>
+          <Empty v-else />
         </div>
         <div class="right flex-[4] shrink-0 pl-4 overflow-auto">
           <div v-if="selectArticle.id">
@@ -220,50 +211,46 @@ function next() {
               <div class="text-2xl font-bold">学习记录</div>
               <div class="mt-1 mb-3">总学习时长：{{ msToHourMinute(total(currentPractice, 'spend')) }}</div>
               <div
-                  class="item border border-item border-solid mt-2 p-2 bg-[var(--bg-history)] rounded-md flex justify-between"
-                  v-for="i in currentPractice">
+                class="item border border-item border-solid mt-2 p-2 bg-[var(--bg-history)] rounded-md flex justify-between"
+                v-for="i in currentPractice"
+              >
                 <span class="color-gray">{{ _dateFormat(i.startDate) }}</span>
                 <span>{{ msToHourMinute(i.spend) }}</span>
               </div>
             </div>
             <div class="en-article-family title text-xl">
-              <div class="text-center text-2xl my-2">
-                <ArticleAudio
-                    :article="selectArticle"
-                    :autoplay="settingStore.articleAutoPlayNext"
-                    @ended="next"/>
+              <div class="text-center text-2xl mb-6">
+                <ArticleAudio :article="selectArticle" :autoplay="settingStore.articleAutoPlayNext" @ended="next" />
               </div>
               <div class="text-center text-2xl">{{ selectArticle.title }}</div>
               <div class="text-2xl" v-if="selectArticle.text">
                 <div class="my-5" v-for="t in selectArticle.text.split('\n\n')">{{ t }}</div>
+                <div class="text-right italic mb-5">{{ selectArticle?.quote?.text }}</div>
               </div>
             </div>
             <div class="mt-2">
               <div class="text-center text-2xl">{{ selectArticle.titleTranslate }}</div>
               <div class="text-xl" v-if="selectArticle.textTranslate">
                 <div class="my-5" v-for="t in selectArticle.textTranslate.split('\n\n')">{{ t }}</div>
+                <div class="text-right italic mb-5">{{ selectArticle?.quote?.translate }}</div>
               </div>
-              <Empty v-else/>
+              <Empty v-else />
             </div>
           </div>
-          <Empty v-else/>
+          <Empty v-else />
         </div>
       </div>
     </div>
 
     <div class="card mb-0 dict-detail-card" v-else>
       <div class="dict-header flex justify-between items-center relative">
-        <BackIcon class="dict-back z-2" @click="isAdd ? $router.back():(isEdit = false)"/>
-        <div class="dict-title absolute text-2xl text-align-center w-full">{{ runtimeStore.editDict.id ? '修改' : '创建' }}书籍
+        <BackIcon class="dict-back z-2" @click="isAdd ? $router.back() : (isEdit = false)" />
+        <div class="dict-title absolute text-2xl text-align-center w-full">
+          {{ runtimeStore.editDict.id ? '修改' : '创建' }}书籍
         </div>
       </div>
       <div class="center">
-        <EditBook
-            :is-add="isAdd"
-            :is-book="true"
-            @close="formClose"
-            @submit="isEdit = isAdd = false"
-        />
+        <EditBook :is-add="isAdd" :is-book="true" @close="formClose" @submit="isEdit = isAdd = false" />
       </div>
     </div>
   </BasePage>
@@ -284,7 +271,7 @@ function next() {
 
 @media (max-width: 768px) {
   .dict-detail-card {
-   height: calc(100vh - 2rem);
+    height: calc(100vh - 2rem);
   }
 
   .dict-header {
@@ -327,5 +314,4 @@ function next() {
     }
   }
 }
-
 </style>

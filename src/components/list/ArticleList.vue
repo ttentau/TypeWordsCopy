@@ -107,9 +107,9 @@ defineExpose({ scrollToBottom, scrollToItem })
               <IconFluentStar16Regular v-if="!isArticleCollect(item)" />
               <IconFluentStar16Filled v-else />
             </BaseIcon>
-            <BaseIcon title="可播放音频" v-if="item.audioSrc || item.audioFileId" noBg>
-              <IconBxVolumeFull class="opacity-100! color-gray" />
-            </BaseIcon>
+<!--            <BaseIcon title="可播放音频" v-if="item.audioSrc || item.audioFileId" noBg>-->
+<!--              <IconBxVolumeFull class="opacity-100! color-gray" />-->
+<!--            </BaseIcon>-->
           </div>
         </div>
       </template>

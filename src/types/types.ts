@@ -66,7 +66,7 @@ export interface Sentence {
 }
 
 export interface Article {
-  id?: number|string
+  id?: number | string
   title: string
   titleTranslate: string
   text: string
@@ -83,6 +83,18 @@ export interface Article {
     correctAnswer: string[]
     explanation: string
   }[]
+  quote?: {
+    start: number
+    text: string
+    translate: string
+    end: number
+  }
+  question?: {
+    start: number
+    text: string
+    translate: string
+    end: number
+  }
 }
 
 export interface Statistics {
@@ -309,10 +321,7 @@ export const WordPracticeModeStageMap: Record<WordPracticeMode, WordPracticeStag
     WordPracticeStage.DictationReviewAll,
     WordPracticeStage.Complete,
   ],
-  [WordPracticeMode.Shuffle]: [
-    WordPracticeStage.Shuffle,
-    WordPracticeStage.Complete,
-  ],
+  [WordPracticeMode.Shuffle]: [WordPracticeStage.Shuffle, WordPracticeStage.Complete],
   [WordPracticeMode.Review]: [
     WordPracticeStage.IdentifyReview,
     WordPracticeStage.ListenReview,

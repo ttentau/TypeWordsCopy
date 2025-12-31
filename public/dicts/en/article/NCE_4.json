@@ -3,14 +3,19 @@
     "id": "fPlqrZ",
     "title": "Finding fossil man",
     "titleTranslate": "发现化石人",
-    "text": "We can read of things that happened 5,000 years ago in the Near East, where people first learned to write. \nBut there are some parts of the word where even now people cannot write. \nThe only way that they can preserve their history is to recount it as sagas--legends handed down from one generation of another. \nThese legends are useful because they can tell us something about migrations of people who lived long ago, \nbut none could write down what they did. \nAnthropologists wondered where the remote ancestors of the Polynesian peoples now living in the Pacific Islands came from. \nThe sagas of these people explain that some of them came from Indonesia about 2,000 years ago. \nBut the first people who were like ourselves lived so long ago that even their sagas, if they had any, are forgotten. \nSo archaeologists have neither history nor legends to help them to find out where the first 'modern men' came from. \nFortunately, however, ancient men made tools of stone, especially flint, \nbecause this is easier to shape than other kinds. \nThey may also have used wood and skins, but these have rotted away. \nStone does not decay, \nand so the tools of long ago have remained when even the bones of the men who made them have disappeared without trace.\n\nROBIN PLACE Finding fossil man",
-    "textTranslate": "我们从书籍中可读到5,000 年前近东发生的事情，那里的人最早学会了写字。 \n但直到现在,世界上有些地方，人们还不会书写。 \n他们保存历史的唯一办法是将历史当作传说讲述，由讲述人一代接一代地将史实描述为传奇故事口传下来。 \n这些传说很有用，因为它们可以告诉我们很久以前人们的迁徙， \n但没有人能写下他们做了什么。 \n人类学家想知道现在生活在太平洋岛屿上的波利尼西亚人的祖先来自哪里。 \n这些人的传说解释说，他们中的一些人大约在2000年前来自印度尼西亚。 \n但是，与我们相似的第一批人生活在很久以前，即使他们有传奇故事，也被遗忘了。 \n因此，考古学家既没有历史也没有传说来帮助他们找出第一批“现代人”来自哪里。 \n然而，幸运的是，古人用石头，尤其是燧石制作了工具， \n因为这比其他种类更容易成形。 \n他们也可能使用木头和兽皮，但这些都腐烂了。 \n石头不会腐烂， \n所以，很久以前的工具保存了下来，而制造这些工具的人的骨头却消失得无影无踪。 \n\n寻找化石人",
+    "text": "We can read of things that happened 5,000 years ago in the Near East, where people first learned to write. \nBut there are some parts of the word where even now people cannot write. \nThe only way that they can preserve their history is to recount it as sagas--legends handed down from one generation of another. \nThese legends are useful because they can tell us something about migrations of people who lived long ago, \nbut none could write down what they did. \nAnthropologists wondered where the remote ancestors of the Polynesian peoples now living in the Pacific Islands came from. \nThe sagas of these people explain that some of them came from Indonesia about 2,000 years ago. \nBut the first people who were like ourselves lived so long ago that even their sagas, if they had any, are forgotten. \nSo archaeologists have neither history nor legends to help them to find out where the first 'modern men' came from. \nFortunately, however, ancient men made tools of stone, especially flint, \nbecause this is easier to shape than other kinds. \nThey may also have used wood and skins, but these have rotted away. \nStone does not decay, \nand so the tools of long ago have remained when even the bones of the men who made them have disappeared without trace.",
+    "textTranslate": "我们从书籍中可读到5,000 年前近东发生的事情，那里的人最早学会了写字。 \n但直到现在,世界上有些地方，人们还不会书写。 \n他们保存历史的唯一办法是将历史当作传说讲述，由讲述人一代接一代地将史实描述为传奇故事口传下来。 \n这些传说很有用，因为它们可以告诉我们很久以前人们的迁徙， \n但没有人能写下他们做了什么。 \n人类学家想知道现在生活在太平洋岛屿上的波利尼西亚人的祖先来自哪里。 \n这些人的传说解释说，他们中的一些人大约在2000年前来自印度尼西亚。 \n但是，与我们相似的第一批人生活在很久以前，即使他们有传奇故事，也被遗忘了。 \n因此，考古学家既没有历史也没有传说来帮助他们找出第一批“现代人”来自哪里。 \n然而，幸运的是，古人用石头，尤其是燧石制作了工具， \n因为这比其他种类更容易成形。 \n他们也可能使用木头和兽皮，但这些都腐烂了。 \n石头不会腐烂， \n所以，很久以前的工具保存了下来，而制造这些工具的人的骨头却消失得无影无踪。",
     "newWords": [],
     "audioSrc": "/sound/article/nce4/01－Finding Fossil Man.mp3",
     "audioFileId": "",
-    "lrcPosition": [[16.65,26.3],[26.3,33.25],[33.25,46.11],[46.11,53.82],[53.82,57.22],[57.22,66.79],[66.79,74.55],[74.55,85.77],[85.77,94.92],[94.92,101.6],[101.6,105.92],[105.92,111.94],[111.94,114.51],[114.51,124.55],[124.55,129.13]],
+    "lrcPosition": [[16.65,26.3],[26.3,33.25],[33.25,46.11],[46.11,53.82],[53.82,57.22],[57.22,66.79],[66.79,74.55],[74.55,85.77],[85.77,94.92],[94.92,101.6],[101.6,105.92],[105.92,111.94],[111.94,114.51],[114.51,124.55]],
     "questions": [],
-    "nameList": [],
+    "quote": {
+       "start": 124.55,
+      "text": "ROBIN PLACE Finding fossil man",
+      "translate": "寻找化石人",
+      "end": 129.13
+    },
     "textAllWords": [],
     "question": {
       "start": 10.9,
