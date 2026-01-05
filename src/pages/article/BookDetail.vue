@@ -9,7 +9,16 @@ import BaseButton from '@/components/BaseButton.vue'
 import { useRoute, useRouter } from 'vue-router'
 import EditBook from '@/pages/article/components/EditBook.vue'
 import { computed, onMounted, onUnmounted, watch } from 'vue'
-import { _dateFormat, _getDictDataByUrl, isMobile, msToHourMinute, resourceWrap, total, useNav, _nextTick } from '@/utils'
+import {
+  _dateFormat,
+  _getDictDataByUrl,
+  isMobile,
+  msToHourMinute,
+  resourceWrap,
+  total,
+  useNav,
+  _nextTick,
+} from '@/utils'
 import { getDefaultArticle, getDefaultDict } from '@/types/func.ts'
 import Toast from '@/components/base/toast/Toast.ts'
 import ArticleAudio from '@/pages/article/components/ArticleAudio.vue'
@@ -109,11 +118,18 @@ async function init() {
 
 onMounted(() => {
   init()
-  if (displayMode === 'typing-style') {
-    positionTranslations()
-  }
+
   window.addEventListener('resize', handleResize)
 })
+
+watch(
+  () => selectArticle.id,
+  () => {
+    if (displayMode === 'typing-style') {
+    }
+    positionTranslations()
+  }
+)
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
@@ -219,21 +235,21 @@ interface ParsedParagraph {
 
 function parseTextToSections(text: string, textTranslate: string): ParsedParagraph[] {
   if (!text) return []
-  
+
   // 按段落分割（双换行）
   const textParagraphs = text.split('\n\n').filter(p => p.trim())
   const translateParagraphs = textTranslate ? textTranslate.split('\n\n').filter(p => p.trim()) : []
-  
+
   // 句子分割正则：按句号、问号、感叹号分割，但保留标点
   const sentenceRegex = /([^.!?]+[.!?]+)/g
-  
+
   return textParagraphs.map((para, paraIndex) => {
     // 分割句子
     const sentences = para.match(sentenceRegex) || [para]
-    const translateSentences = translateParagraphs[paraIndex] 
-      ? (translateParagraphs[paraIndex].match(sentenceRegex) || [translateParagraphs[paraIndex]])
+    const translateSentences = translateParagraphs[paraIndex]
+      ? translateParagraphs[paraIndex].match(sentenceRegex) || [translateParagraphs[paraIndex]]
       : []
-    
+
     return {
       sentences: sentences.map((sent, sentIndex) => ({
         text: sent.trim(),
@@ -251,40 +267,32 @@ const parsedArticle = $computed(() => {
 
 // 定位翻译到原文下方
 function positionTranslations() {
-  if (!parsedArticle || isMob || !articleWrapperRef) return
-  
-  return new Promise<void>(resolve => {
-    _nextTick(() => {
-      if (!articleWrapperRef) {
-        resolve()
-        return
-      }
-      
-      const articleRect = articleWrapperRef.getBoundingClientRect()
-      
-      parsedArticle?.forEach((paragraph, paraIndex) => {
-        paragraph.sentences.forEach((sentence, sentIndex) => {
-          const location = `${paraIndex}-${sentIndex}`
-          const sentenceClassName = `.sentence-${location}`
-          const sentenceEl = articleWrapperRef?.querySelector(sentenceClassName)
-          const translateClassName = `.translate-${location}`
-          const translateEl = articleWrapperRef?.querySelector(translateClassName) as HTMLDivElement
-          
-          if (sentenceEl && translateEl && sentence.translate) {
-            const sentenceRect = sentenceEl.getBoundingClientRect()
-            translateEl.style.opacity = '1'
-            translateEl.style.top = sentenceRect.top - articleRect.top + 24 + 'px'
-            const spaceEl = translateEl.firstElementChild as HTMLElement
-            if (spaceEl) {
-              spaceEl.style.width = sentenceRect.left - articleRect.left + 'px'
-            }
+  // if ( isMob || !articleWrapperRef) return
+  _nextTick(() => {
+    const articleRect = articleWrapperRef.getBoundingClientRect()
+    console.log('articleRect',articleRect)
+    selectArticle.textTranslate.split('\n\n').forEach((paragraph, paraIndex) => {
+      paragraph.split('\n').forEach((sentence, sentIndex) => {
+        debugger
+        const location = `${paraIndex}-${sentIndex}`
+        const sentenceClassName = `.sentence-${location}`
+        const sentenceEl = articleWrapperRef?.querySelector(sentenceClassName)
+        const translateClassName = `.translate-${location}`
+        const translateEl = articleWrapperRef?.querySelector(translateClassName) as HTMLDivElement
+
+        if (sentenceEl && translateEl && sentence) {
+          const sentenceRect = sentenceEl.getBoundingClientRect()
+          console.log('sentenceRect',sentenceEl.innerText, sentenceRect)
+          translateEl.style.opacity = '1'
+          translateEl.style.top = sentenceRect.top - articleRect.top + 24 + 'px'
+          const spaceEl = translateEl.firstElementChild as HTMLElement
+          if (spaceEl) {
+            spaceEl.style.width = sentenceRect.left - articleRect.left + 'px'
           }
-        })
+        }
       })
-      
-      resolve()
-    }, 300)
-  })
+    })
+  }, 300)
 }
 
 // 监听显示模式和文章变化，重新定位翻译
@@ -296,14 +304,16 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
 </script>
 
 <template>
-  <div class="center h-screen overflow-hidden">
+  <div class="center h-screen">
     <div
       class="mb-0 flex p-space box-border flex-col bg-second w-full 3xl:w-7/10 2xl:w-8/10 xl:w-full 2xl:card 2xl:h-[97vh] h-full"
       v-if="showBookDetail"
     >
       <div class="dict-header flex justify-between items-center relative">
-        <BackIcon class="dict-back z-2" />
-        <div class="dict-title absolute text-2xl text-align-center w-full">{{ runtimeStore.editDict.name }}</div>
+        <div class="flex gap-space">
+          <BackIcon class="dict-back z-2" />
+          <div class="dict-title text-2xl text-align-center">{{ runtimeStore.editDict.name }}</div>
+        </div>
         <div class="dict-actions flex">
           <BaseButton v-if="runtimeStore.editDict.custom && runtimeStore.editDict.url" type="info" @click="reset">
             恢复默认
@@ -348,7 +358,10 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
                       <span class="ml-6 text-2xl" v-if="showTranslate">{{ selectArticle.titleTranslate }}</span>
                     </span>
                     <div class="flex items-center gap-2 mr-4">
-                      <BaseIcon :title="`切换显示模式`" @click="displayMode = displayMode === 'normal' ? 'typing-style' : 'normal'">
+                      <BaseIcon
+                        :title="`切换显示模式`"
+                        @click="displayMode = displayMode === 'normal' ? 'typing-style' : 'normal'"
+                      >
                         <IconFluentTextParagraph16Regular v-if="displayMode === 'normal'" />
                         <IconFluentTextAlignLeft16Regular v-else />
                       </BaseIcon>
@@ -363,19 +376,32 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
                   </div>
                 </div>
 
-                <!-- 普通显示模式 -->
-                <template v-if="displayMode === 'normal'">
+                <template v-if="false">
+                  <!--                原文-->
                   <div class="text-2xl en-article-family space-y-5" v-if="selectArticle.text">
+                    <!--                  <div class="break-words w-full" v-for="(t, i) in selectArticle.text.split('\n\n')">-->
+                    <!--                    <span v-for="(w, j) in t.split('\n')" :class="`sentence-${i}-${j}`" :key="`${i}-${j}`">-->
+                    <!--                      &lt;!&ndash;                      <span v-for="(s,n) in w.split(' ')">{{s}}</span>&ndash;&gt;-->
+                    <!--                      {{ w }}-->
+                    <!--                    </span>-->
+                    <!--                  </div>-->
                     <div v-for="t in selectArticle.text.split('\n\n')">{{ t }}</div>
                     <div class="text-right italic">{{ selectArticle?.quote?.text }}</div>
                   </div>
 
+                  <!--                译文-->
                   <template v-if="showTranslate">
                     <div class="line"></div>
                     <div class="text-xl line-height-normal space-y-5" v-if="selectArticle.textTranslate">
                       <div class="mt-2" v-if="selectArticle?.question?.translate">
                         问题: {{ selectArticle?.question?.translate }}
                       </div>
+                      <!--                    <div class="break-words w-full" v-for="(t, i) in selectArticle.textTranslate.split('\n\n')">-->
+                      <!--                      <span v-for="(w, j) in t.split('\n')" :class="`translate-${i}-${j}`" :key="`${i}-${j}`">-->
+                      <!--                        &lt;!&ndash;                      <span v-for="(s,n) in w.split(' ')">{{s}}</span>&ndash;&gt;-->
+                      <!--                        {{ w }}-->
+                      <!--                      </span>-->
+                      <!--                    </div>-->
                       <div v-for="t in selectArticle.textTranslate.split('\n\n')">{{ t }}</div>
                       <div class="text-right italic">{{ selectArticle?.quote?.translate }}</div>
                     </div>
@@ -384,21 +410,12 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
                 </template>
 
                 <!-- 打字式显示模式 -->
-                <template v-else-if="displayMode === 'typing-style' && parsedArticle">
-                  <div
-                    class="article-content"
-                    :class="[showTranslate && 'tall']"
-                    ref="articleWrapperRef"
-                  >
+                <template v-if="true">
+                  <div class="article-content" :class="[showTranslate && 'tall']" ref="articleWrapperRef">
                     <article>
-                      <div class="section" v-for="(paragraph, paraIndex) in parsedArticle" :key="paraIndex">
-                        <span
-                          class="sentence"
-                          :class="`sentence-${paraIndex}-${sentIndex}`"
-                          v-for="(sentence, sentIndex) in paragraph.sentences"
-                          :key="`${paraIndex}-${sentIndex}`"
-                        >
-                          {{ sentence.text }}&nbsp;
+                      <div class="break-words w-full section" v-for="(t, i) in selectArticle.text.split('\n\n')">
+                        <span v-for="(w, j) in t.split('\n')" :class="`sentence-${i}-${j}`" :key="`${i}-${j}`"
+                          >{{ w }}
                         </span>
                       </div>
                       <div class="text-right italic" v-if="selectArticle?.quote?.text">
@@ -406,19 +423,15 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
                       </div>
                     </article>
                     <div class="translate" v-show="showTranslate">
-                      <template v-for="(paragraph, paraIndex) in parsedArticle" :key="`t-${paraIndex}`">
-                        <div
-                          class="row"
-                          :class="`translate-${paraIndex}-${sentIndex}`"
-                          v-for="(sentence, sentIndex) in paragraph.sentences"
-                          :key="`${paraIndex}-${sentIndex}`"
-                        >
+                      <div
+                        class="break-words w-full section"
+                        v-for="(t, i) in selectArticle.textTranslate.split('\n\n')"
+                      >
+                        <div v-for="(w, j) in t.split('\n')" :class="`row translate-${i}-${j}`" :key="`${i}-${j}`">
                           <span class="space"></span>
-                          <Transition name="fade">
-                            <span class="text" v-if="sentence.translate">{{ sentence.translate }}</span>
-                          </Transition>
+                          <span>{{ w }}</span>
                         </div>
-                      </template>
+                      </div>
                       <div class="text-right italic" v-if="selectArticle?.quote?.translate">
                         {{ selectArticle?.quote?.translate }}
                       </div>
@@ -426,7 +439,11 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
                   </div>
                   <!-- 移动端显示翻译 -->
                   <template v-if="isMob && showTranslate">
-                    <div class="sentence-translate-mobile" v-for="(paragraph, paraIndex) in parsedArticle" :key="`m-${paraIndex}`">
+                    <div
+                      class="sentence-translate-mobile"
+                      v-for="(paragraph, paraIndex) in parsedArticle"
+                      :key="`m-${paraIndex}`"
+                    >
                       <div v-for="(sentence, sentIndex) in paragraph.sentences" :key="`${paraIndex}-${sentIndex}`">
                         <div v-if="sentence.translate" class="mt-2">{{ sentence.translate }}</div>
                       </div>
@@ -453,7 +470,7 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
                   :article="selectArticle"
                   @update-speed="handleSpeedUpdate"
                   @update-volume="handleVolumeUpdate"
-                  :autoplay="(settingStore.articleAutoPlayNext && startPlay)"
+                  :autoplay="settingStore.articleAutoPlayNext && startPlay"
                   @ended="next"
                 />
                 <div class="flex items-center gap-1">

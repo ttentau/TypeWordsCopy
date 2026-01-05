@@ -111,7 +111,7 @@ watch(
       </div>
     </div>
 
-    <div class="flex-1 z-1 relative main-content">
+    <div class="flex-1 z-1 relative main-content overflow-x-hidden">
       <router-view></router-view>
     </div>
   </div>
