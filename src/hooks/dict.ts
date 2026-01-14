@@ -234,14 +234,18 @@ export function useGetDict() {
   )
 
   onMounted(() => {
-    if (!runtimeStore.editDict?.id) {
-      let dictId = route.query?.id
-      if (!dictId) {
-        return router.push('/articles')
+    if (route.query?.isAdd) {
+      runtimeStore.editDict = getDefaultDict()
+    }else {
+      if (!runtimeStore.editDict?.id) {
+        let dictId = route.query?.id
+        if (!dictId) {
+          return router.push('/articles')
+        }
+        loading.value = true
+      } else {
+        loadDict(runtimeStore.editDict)
       }
-      loading.value = true
-    } else {
-      loadDict(runtimeStore.editDict)
     }
   })
 
