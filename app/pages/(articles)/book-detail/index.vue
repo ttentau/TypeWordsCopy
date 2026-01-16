@@ -225,7 +225,7 @@ watch([() => displayMode, () => selectArticle.id, () => showTranslate], () => {
               恢复默认
             </BaseButton>
             <BaseButton :loading="studyLoading || loading" type="info" @click="isEdit = true">编辑</BaseButton>
-            <BaseButton type="info" @click="router.push('batch-edit-article')">文章管理</BaseButton>
+            <BaseButton type="info" @click="router.push('/batch-edit-article')">文章管理</BaseButton>
             <BaseButton :loading="studyLoading || loading" @click="startPractice">学习</BaseButton>
           </div>
         </div>
