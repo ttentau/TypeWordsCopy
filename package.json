@@ -7,7 +7,7 @@
     "build": "nuxt build",
     "test": "",
     "generate-old": "nuxt generate && node scripts/do.js",
-    "generate": "pnpm --filter vscode-web build && node scripts/copy-vscode-web.js && pnpm run generate",
+    "generate": "pnpm --filter vscode-web build && node scripts/copy-vscode-web.js && nuxt generate && node scripts/do.js",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "sitemap": "node scripts/do.js",
