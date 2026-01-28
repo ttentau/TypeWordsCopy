@@ -1,6 +1,6 @@
 import * as VueRouter from 'vue-router'
 import { RouteRecordRaw } from 'vue-router'
-import { dict } from '@typewords/ui'
+import { dict } from '@typewords/ui/pages/index.ts'
 
 export const routes: RouteRecordRaw[] = [
   { path: '/', component: dict },

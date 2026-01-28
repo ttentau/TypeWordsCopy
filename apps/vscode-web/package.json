@@ -16,7 +16,9 @@
     "deploy-oss": "node scripts/deploy-oss.js"
   },
   "dependencies": {
-    "@typewords/ui": "workspace:*"
+    "@typewords/ui": "workspace:*",
+    "@typewords/utils": "workspace:*",
+    "@typewords/hooks": "workspace:*"
   },
   "config": {
     "commitizen": {

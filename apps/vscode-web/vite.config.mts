@@ -110,6 +110,7 @@ export default defineConfig(() => {
         resolve: {
           alias: {
             '@': pathResolve('src'),
+            '@ui': '@typewords/ui',
             // '~': pathResolve('src'),
             // '@': pathResolve2('../app'),
             // '~': pathResolve2('../app'),

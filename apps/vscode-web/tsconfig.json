@@ -29,13 +29,17 @@
     "types": [
       "vite/client",
       "unplugin-vue-macros/macros-global",
-      "unplugin-vue-components/types"  // 让 TS 识别自动导入组件
+      "unplugin-vue-components/types"
+      // 让 TS 识别自动导入组件
     ],
     "baseUrl": "src",
     //This is because TypeScript does not resolve webpack aliases automatically.
     //For TS to resolve aliases, they should be added in tsconfig.json under compilerOptions.paths:
     // https://betterprogramming.pub/the-right-usage-of-aliases-in-webpack-typescript-4418327f47fa
     "paths": {
+      "@ui/*": [
+        "../../../packages/ui/src/*"
+      ],
       "@/*": [
         "*"
       ]
@@ -47,7 +51,7 @@
     "src/**/*.tsx",
     "src/**/*.d.ts",
     "src/**/*.vue",
-    "src/vite-env.d.ts",
+    "src/vite-env.d.ts"
   ],
   "references": [
     {

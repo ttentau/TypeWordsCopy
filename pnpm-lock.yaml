@@ -263,11 +263,32 @@ importers:
 
   apps/vscode-web:
     dependencies:
+      '@typewords/hooks':
+        specifier: workspace:*
+        version: link:../../packages/hooks
       '@typewords/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@typewords/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
 
-  packages/ui: {}
+  packages/hooks:
+    dependencies:
+      '@typewords/utils':
+        specifier: workspace:*
+        version: link:../utils
+
+  packages/ui:
+    dependencies:
+      '@typewords/hooks':
+        specifier: workspace:*
+        version: link:../hooks
+      '@typewords/utils':
+        specifier: workspace:*
+        version: link:../utils
+
+  packages/utils: {}
 
 packages:
 

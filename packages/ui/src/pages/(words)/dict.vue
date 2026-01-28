@@ -5,5 +5,5 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div>{{ t('start_article_practice') }}</div>
+  <div>123{{ t('start_article_practice') }}</div>
 </template>

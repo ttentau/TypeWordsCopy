@@ -1,1 +1,2 @@
-export { default as dict } from './dict.vue'
+export * from './pages'
+export * from './components'
