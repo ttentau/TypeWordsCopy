@@ -1,8 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 
-const sourceDir = path.resolve(__dirname, '../vscode-web/dist')
-const targetDir = path.resolve(__dirname, '../public/vscode')
+const sourceDir = path.resolve(__dirname, '../dist')
+const targetDir = path.resolve(__dirname, '../../../dist')
 
 // 递归复制目录
 function copyDir(src, dest) {
