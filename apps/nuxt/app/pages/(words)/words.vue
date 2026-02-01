@@ -117,6 +117,11 @@ async function init() {
     if (d) {
       currentStudy = d.taskWords
       isSaveData = true
+      if(!currentStudy.new.length && !currentStudy.review.length&& !currentStudy.write.length) {
+        isSaveData = false
+        setPracticeWordCache(null)
+        init()
+      }
     } else {
       currentStudy = getCurrentStudyWord()
     }
