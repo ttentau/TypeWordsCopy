@@ -1,4 +1,4 @@
-name: Deploy to Aliyun OSS
+name: Deploy to EoPages VsCode
 
 on:
 #  push:
