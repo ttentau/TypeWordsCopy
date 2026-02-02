@@ -8,7 +8,7 @@
  * 环境变量: EO_PAGES_TOKEN（必填）
  */
 
-const { exec } = require('child_process')
+const { spawn } = require('child_process')
 const path = require('path')
 
 const argv = process.argv.slice(2)
@@ -37,11 +37,8 @@ if (!EO_PAGES_TOKEN) {
 const distPath = path.resolve(process.cwd(), dir)
 const cmd = `edgeone pages deploy "${distPath}" -n ${name} -t ${EO_PAGES_TOKEN}`
 
-exec(cmd, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`执行命令时出错: ${error.message}`)
-    process.exit(1)
-  }
-  if (stderr) console.error(stderr)
-  if (stdout) console.log(stdout)
+const child = spawn(cmd, [], { shell: true, stdio: 'inherit' })
+child.on('close', (code) => {
+  process.exit(code ?? 0)
 })
+
