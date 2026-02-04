@@ -727,8 +727,26 @@ useEvents([
     </template>
     <template v-slot:footer>
       <div class="footer-container">
-        <div class="border-item-solid rounded-md p-2 flex items-center">
-          <input type="text" placeholder="和AI助手对话…" class="input" />
+        <div class="border-solid rounded-md p-2 items-center">
+          <textarea type="text" placeholder="Plan @ for contexts, / for commands" class="w-full outline-none bg-transparent border-none" />
+          <div class="flex justify-between mt-2">
+            <div class="flex gap-space">
+              <div class="flex items-center gap-1 rounded-md bg-red">
+                <IconFluentAdd16Regular />
+                <span>Agent</span>
+                <IconFluentAdd16Regular />
+              </div>
+              <div class="flex items-center gap-1">
+                <span>Auto</span>
+                <IconFluentAdd16Regular />
+              </div>
+            </div>
+            <div>
+              <IconFluentAdd16Regular />
+              <IconFluentAdd16Regular />
+              <IconFluentAdd16Regular />
+            </div>
+          </div>
         </div>
       </div>
       <!--      <Footer-->

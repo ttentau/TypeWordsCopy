@@ -15,6 +15,7 @@ import Toast from '~/components/base/toast/Toast'
 import Tooltip from '~/components/base/Tooltip.vue'
 import { ShortcutKey, WordPracticeStage, WordPracticeType } from '~/types/enum'
 import { useI18n } from 'vue-i18n'
+import HoverReveal from '@/components/word/HoverReveal.vue'
 const { t: $t } = useI18n()
 
 interface IProps {
@@ -40,10 +41,7 @@ let wordRepeatCount = 0
 // 记录单词完成的时间戳，用于防止同时按下最后一个字母和空格键时跳过单词
 let wordCompletedTime = 0
 let jumpTimer = -1
-let cursor = $ref({
-  top: 0,
-  left: 0,
-})
+
 const settingStore = useSettingStore()
 const statStore = usePracticeStore()
 
@@ -84,7 +82,6 @@ function reset() {
   }
   // 更新当前单词信息
   updateCurrentWordInfo()
-  checkCursorPosition()
 }
 
 // 监听输入变化，更新当前单词信息
@@ -421,40 +418,6 @@ function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-watch([() => input, () => showFullWord, () => settingStore.dictation], checkCursorPosition)
-
-//检测光标位置
-function checkCursorPosition() {
-  _nextTick(() => {
-    // 选中目标元素
-    const cursorEl = document.querySelector(`.cursor`)
-    const inputList = document.querySelectorAll(`.l`)
-    if (!typingWordRef) return
-    const typingWordRect = typingWordRef.getBoundingClientRect()
-
-    if (inputList.length) {
-      let inputRect = last(Array.from(inputList)).getBoundingClientRect()
-      cursor = {
-        top: inputRect.top + inputRect.height - cursorEl.clientHeight - typingWordRect.top,
-        left: inputRect.right - typingWordRect.left - 3,
-      }
-    } else {
-      const dictation = document.querySelector(`.dictation`)
-      let elRect
-      if (dictation) {
-        elRect = dictation.getBoundingClientRect()
-      } else {
-        const letter = document.querySelector(`.letter`)
-        elRect = letter.getBoundingClientRect()
-      }
-      cursor = {
-        top: elRect.top + elRect.height - cursorEl.clientHeight - typingWordRect.top,
-        left: elRect.left - typingWordRect.left - 3,
-      }
-    }
-  })
-}
-
 useEvents([
   [ShortcutKey.KnowWord, know],
   [ShortcutKey.UnknownWord, unknown],
@@ -463,92 +426,93 @@ useEvents([
 
 <template>
   <div class="typing-word" ref="typingWordRef" v-if="word.word.length">
-    <div class="flex flex-col items-center">
-      <div class="flex gap-1 mt-30">
-        <div
-          class="phonetic"
-          :class="
-            (settingStore.dictation ||
-              [WordPracticeType.Spell, WordPracticeType.Listen, WordPracticeType.Dictation].includes(
-                settingStore.wordPracticeType
-              )) &&
-            !showFullWord &&
-            !showWordResult &&
-            'word-shadow'
-          "
-          v-if="settingStore.soundType === 'uk' && word.phonetic0"
-        >
-          [{{ word.phonetic0 }}]
-        </div>
-        <div
-          class="phonetic"
-          :class="
-            (settingStore.dictation ||
-              [WordPracticeType.Spell, WordPracticeType.Listen, WordPracticeType.Dictation].includes(
-                settingStore.wordPracticeType
-              )) &&
-            !showFullWord &&
-            !showWordResult &&
-            'word-shadow'
-          "
-          v-if="settingStore.soundType === 'us' && word.phonetic1"
-        >
-          [{{ word.phonetic1 }}]
-        </div>
-        <VolumeIcon
-          :title="`发音(${settingStore.shortcutKeyMap[ShortcutKey.PlayWordPronunciation]})`"
-          ref="volumeIconRef"
-          :simple="true"
-          :cb="() => playWordAudio(word.word)"
-        />
-      </div>
-
-      <Tooltip
-        :title="
+    <div class="flex flex-col">
+      <div class="flex gap-space items-center">
+        <Tooltip
+          :title="
           settingStore.dictation ? `可以按快捷键 ${settingStore.shortcutKeyMap[ShortcutKey.ShowWord]} 显示单词` : ''
         "
-      >
-        <div
-          id="word"
-          class="word my-1"
-          :class="wrong && 'is-wrong'"
-          :style="{ fontSize: settingStore.fontSize.wordForeignFontSize + 'px' }"
-          @mouseenter="showWord"
-          @mouseleave="mouseleave"
         >
-          <div v-if="settingStore.wordPracticeType === WordPracticeType.Dictation">
-            <div
-              class="letter text-align-center w-full inline-block"
-              v-opacity="!settingStore.dictation || showWordResult || showFullWord"
-            >
-              {{ word.word }}
+          <div
+            id="word"
+            class="word"
+            :class="wrong && 'is-wrong'"
+            @mouseenter="showWord"
+            @mouseleave="mouseleave"
+          >
+            <div v-if="settingStore.wordPracticeType === WordPracticeType.Dictation">
+              <div
+                class="letter text-align-center w-full inline-block"
+                v-opacity="!settingStore.dictation || showWordResult || showFullWord"
+              >
+                {{ word.word }}
+              </div>
+              <div
+                class="mt-2 w-120 dictation"
+                :class="showWordResult ? (right ? 'right' : 'wrong') : ''"
+              >
+                <template v-for="i in input">
+                  <span class="l" v-if="i !== ' '">{{ i }}</span>
+                  <Space class="l" v-else :is-wrong="showWordResult ? !right : false" :is-wait="!showWordResult" />
+                </template>
+              </div>
             </div>
-            <div
-              class="mt-2 w-120 dictation"
-              :style="{ minHeight: settingStore.fontSize.wordForeignFontSize + 'px' }"
-              :class="showWordResult ? (right ? 'right' : 'wrong') : ''"
-            >
-              <template v-for="i in input">
-                <span class="l" v-if="i !== ' '">{{ i }}</span>
-                <Space class="l" v-else :is-wrong="showWordResult ? !right : false" :is-wait="!showWordResult" />
-              </template>
-            </div>
-          </div>
-          <template v-else>
-            <span class="input" v-if="input">{{ input }}</span>
-            <span class="wrong" v-if="wrong">{{ wrong }}</span>
-            <span class="letter" v-if="settingStore.dictation && !showFullWord">
+            <template v-else>
+              <span class="input" v-if="input">{{ input }}</span>
+              <span class="wrong" v-if="wrong">{{ wrong }}</span>
+              <span class="letter" v-if="settingStore.dictation && !showFullWord">
               {{
-                displayWord
-                  .split('')
-                  .map(v => (v === ' ' ? '&nbsp;' : '_'))
-                  .join('')
-              }}
+                  displayWord
+                    .split('')
+                    .map(v => (v === ' ' ? '&nbsp;' : '_'))
+                    .join('')
+                }}
             </span>
-            <span class="letter" v-else>{{ displayWord }}</span>
+              <span class="letter" v-else>{{ displayWord }}</span>
+            </template>
+          </div>
+        </Tooltip>
+        <HoverReveal class="flex gap-1">
+          <div
+            class="phonetic"
+            :class="
+            (settingStore.dictation ||
+              [WordPracticeType.Spell, WordPracticeType.Listen, WordPracticeType.Dictation].includes(
+                settingStore.wordPracticeType
+              )) &&
+            !showFullWord &&
+            !showWordResult &&
+            'word-shadow'
+          "
+            v-if="settingStore.soundType === 'uk' && word.phonetic0"
+          >
+            [{{ word.phonetic0 }}]
+          </div>
+          <div
+            class="phonetic"
+            :class="
+            (settingStore.dictation ||
+              [WordPracticeType.Spell, WordPracticeType.Listen, WordPracticeType.Dictation].includes(
+                settingStore.wordPracticeType
+              )) &&
+            !showFullWord &&
+            !showWordResult &&
+            'word-shadow'
+          "
+            v-if="settingStore.soundType === 'us' && word.phonetic1"
+          >
+            [{{ word.phonetic1 }}]
+          </div>
+          <template v-slot:hover>
+            <VolumeIcon
+              :title="`发音(${settingStore.shortcutKeyMap[ShortcutKey.PlayWordPronunciation]})`"
+              ref="volumeIconRef"
+              :simple="true"
+              :cb="() => playWordAudio(word.word)"
+            />
           </template>
-        </div>
-      </Tooltip>
+        </HoverReveal>
+      </div>
 
       <div
         class="mt-4 flex gap-4"
@@ -571,14 +535,11 @@ useEvents([
       <div
         class="translate flex flex-col gap-2 my-3"
         v-opacity="settingStore.translate || showWordResult || showFullWord"
-        :style="{
-          fontSize: settingStore.fontSize.wordTranslateFontSize + 'px',
-        }"
       >
         <div class="flex" v-for="v in word.trans">
-          <div class="shrink-0" :class="v.pos ? 'w-12 en-article-family' : '-ml-3'">
+          <span class="shrink-0 mr-1" :class="v.pos ? 'en-article-family' : ''">
             {{ v.pos }}
-          </div>
+          </span>
           <span v-if="!settingStore.dictation || showWordResult || showFullWord">{{ v.cn }}</span>
           <span v-else v-html="hideWordInTranslation(v.cn, word.word)"></span>
         </div>
@@ -598,15 +559,17 @@ useEvents([
       <template v-if="word?.sentences?.length">
         <div class="flex flex-col gap-3">
           <div class="sentence" v-for="item in word.sentences">
-            <div class="flex gap-space">
+            <HoverReveal class="flex gap-space">
               <SentenceHightLightWord
                 class="text-xl"
                 :text="item.c"
                 :word="word.word"
                 :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
               />
-              <VolumeIcon :title="`发音`" :simple="false" @click="ttsPlayAudio(item.c)" />
-            </div>
+              <template v-slot:hover>
+                <VolumeIcon :title="`发音`" :simple="false" @click="ttsPlayAudio(item.c)" />
+              </template>
+            </HoverReveal>
             <div class="text-base anim" v-opacity="settingStore.translate || showFullWord || showWordResult">
               {{ item.cn }}
             </div>
@@ -634,14 +597,6 @@ useEvents([
         </div>
       </template>
     </div>
-    <div
-      class="cursor"
-      :style="{
-        top: cursor.top + 'px',
-        left: cursor.left + 'px',
-        height: settingStore.fontSize.wordForeignFontSize + 'px',
-      }"
-    ></div>
   </div>
 </template>
 
@@ -669,10 +624,7 @@ useEvents([
   }
 
   .word {
-    font-size: 3rem;
-    line-height: 1;
-    font-family: var(--en-article-family);
-    letter-spacing: 0.3rem;
+    @apply text-2xl text-left;
 
     .input,
     .right {
