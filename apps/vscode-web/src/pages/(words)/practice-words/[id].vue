@@ -679,7 +679,7 @@ useEvents([
 <template>
   <PracticeLayout v-loading="loading" panelLeft="var(--word-panel-margin-left)">
     <template v-slot:practice>
-      <div class="practice-word">
+      <div class="mb-20 px-4">
         <div>
           存在的问题
           入口分散，新人难找
@@ -719,8 +719,6 @@ useEvents([
           IoC：强调“控制权反转”这个思想。
           DI（Dependency Injection，依赖注入）：强调“依赖由外部注入进来”的实现方式。
           你们项目是 用 DI 这种方式实现了 IoC：通过 useService(...) / f.get(...) 把依赖“注入”进组件或服务，而不是自己在内部 new。所以平时说“项目的 IoC/DI 设计”指的都是这一套。
-        </div>
-        <div class="h-20 w-full">
         </div>
       </div>
     </template>
@@ -767,7 +765,7 @@ useEvents([
       </Panel>
     </template>
     <template v-slot:footer>
-      <div class="footer-container">
+      <div class="footer-container p-4">
         <div class="border-solid rounded-md p-2 items-center">
           <textarea type="text" placeholder="Plan @ for contexts, / for commands" class="w-full outline-none bg-transparent border-none" />
           <div class="flex justify-between mt-2">
@@ -809,9 +807,6 @@ useEvents([
   @apply w-full h-full flex justify-center overflow-hidden;
 }
 
-.practice-word {
-  @apply h-full flex flex-col justify-between items-center relative;
-}
 .word-panel-wrapper {
   position: absolute;
   left: var(--panel-margin-left);
