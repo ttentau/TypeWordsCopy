@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSettingStore } from '@/stores/setting'
+import BasePage from '@/components/BasePage.vue'
 
 const settingStore = useSettingStore()
 defineProps<{
@@ -8,24 +9,26 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-col flex-1 overflow-hidden justify-center relative">
-    <div class="flex-1 overflow-hidden">
-      <div class="overflow-auto h-full box-content">
-        <slot name="practice"></slot>
+  <BasePage :padding="false">
+    <div class="flex flex-col h-full justify-center relative">
+      <div class="flex-1 overflow-hidden">
+        <div class="overflow-auto h-full box-content">
+          <slot name="practice"></slot>
+        </div>
+      </div>
+      <div
+        class="panel-wrap"
+        :style="{ left: panelLeft }"
+        :class="{ 'has-panel': settingStore.showPanel }"
+        @click.self="settingStore.showPanel = false"
+      >
+        <slot name="panel"></slot>
+      </div>
+      <div class="shrink-0">
+        <slot name="footer"></slot>
       </div>
     </div>
-    <div
-      class="panel-wrap"
-      :style="{ left: panelLeft }"
-      :class="{ 'has-panel': settingStore.showPanel }"
-      @click.self="settingStore.showPanel = false"
-    >
-      <slot name="panel"></slot>
-    </div>
-    <div class="shrink-0">
-      <slot name="footer"></slot>
-    </div>
-  </div>
+  </BasePage>
 </template>
 
 <style scoped lang="scss">

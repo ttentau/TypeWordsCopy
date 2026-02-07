@@ -54,26 +54,20 @@ function eventCheck(e) {
 </script>
 
 <template>
-  <div class="setting" @click="eventCheck">
+  <div class="relative z-999" @click="eventCheck">
     <BaseIcon @click="toggle(true)">
       <IconFluentMoreHorizontal20Regular class="color-gray-600" />
     </BaseIcon>
     <MiniDialog width="14rem" v-model="show">
-      <div class="mini-row">
-        <NuxtLink to="/words" class="item-title">单词</NuxtLink>
-      </div>
-      <div class="mini-row">
-        <NuxtLink to="/articles" class="item-title">文章</NuxtLink>
-      </div>
-      <div class="mini-row">
-        <NuxtLink to="/setting" class="item-title">设置</NuxtLink>
-      </div>
+      <NuxtLink to="/words" class="mini-row">单词</NuxtLink>
+<!--      <NuxtLink to="/articles" class="mini-row">文章</NuxtLink>-->
+      <NuxtLink to="/setting" class="mini-row">设置</NuxtLink>
     </MiniDialog>
   </div>
 </template>
 
 <style scoped lang="scss">
-.setting {
-  position: relative;
+.mini-row {
+ @apply hover:bg-gray-700;
 }
 </style>

@@ -545,11 +545,11 @@ useEvents([
     >
       <div class="line-white my-3"></div>
       <template v-if="word?.sentences?.length">
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-">
           <div class="sentence" v-for="item in word.sentences">
-            <HoverReveal class="flex gap-space">
+            <HoverReveal class="flex gap-1">
+              <span>Read</span>
               <SentenceHightLightWord
-                class="text-xl"
                 :text="item.c"
                 :word="word.word"
                 :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
@@ -558,7 +558,7 @@ useEvents([
                 <VolumeIcon :title="`发音`" :simple="false" @click="ttsPlayAudio(item.c)" />
               </template>
             </HoverReveal>
-            <div class="text-base anim" v-opacity="settingStore.translate || showFullWord || showWordResult">
+            <div class="anim" v-opacity="settingStore.translate || showFullWord || showWordResult">
               {{ item.cn }}
             </div>
           </div>
@@ -593,13 +593,11 @@ useEvents([
 .typing-word {
   width: 100%;
   flex: 1;
-  //overflow: auto;
   word-break: break-word;
   position: relative;
 
-  .phonetic,
-  .translate {
-    font-size: 1.2rem;
+  .phonetic, .translate {
+    //font-size: 1.2rem;
   }
 
   .phonetic {
@@ -608,8 +606,6 @@ useEvents([
   }
 
   .word {
-    @apply text-2xl text-left;
-
     .input,
     .right {
       color: rgb(22, 163, 74);

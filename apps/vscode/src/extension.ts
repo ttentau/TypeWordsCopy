@@ -62,6 +62,7 @@ class ChatPanel {
     const websiteUrl = 'https://typewords.cc'
     // const cdnUrl = 'https://vs.typewords.cc'
     const cdnUrl = 'http://tw.cc'
+    const fileUrl = 'https://files.2study.top'
 
     // 生成 nonce 用于 CSP
     const nonce = Buffer.from(Date.now().toString()).toString('base64')
@@ -71,7 +72,7 @@ class ChatPanel {
       "default-src 'none'",
       `script-src 'nonce-${nonce}' ${cdnUrl} 'unsafe-inline'`,
       `style-src ${cdnUrl} 'unsafe-inline'`,
-      `connect-src ${cdnUrl} ${websiteUrl}`,
+      `connect-src ${cdnUrl} ${websiteUrl} ${fileUrl}`,
       'img-src data: https:',
       'font-src data:',
     ].join('; ')
@@ -85,8 +86,8 @@ class ChatPanel {
     <title>单词练习</title>
 
 
-  <script type="module" crossorigin src="${cdnUrl}/assets/index-x5OWSEJi.js"></script>
-  <link rel="stylesheet" crossorigin href="${cdnUrl}/assets/index-C_GoA8hD.css">
+  <script type="module" crossorigin src="${cdnUrl}/assets/index-AL08PUOq.js"></script>
+  <link rel="stylesheet" crossorigin href="${cdnUrl}/assets/index-C_D3dAlt.css">
 </head>
 <body>
     <div id="app"></div>
