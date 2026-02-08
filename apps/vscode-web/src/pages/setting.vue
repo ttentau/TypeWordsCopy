@@ -154,7 +154,7 @@ function getShortcutKeyName(key: string): string {
     ToggleShowTranslate: '切换显示翻译',
     ToggleDictation: '切换默写模式',
     ToggleTheme: '切换主题',
-    ToggleConciseMode: '切换简洁模式',
+    ToggleToolbar: '切换底部工具栏',
     TogglePanel: '切换面板',
     RandomWrite: '随机默写',
     NextRandomWrite: '继续随机默写',

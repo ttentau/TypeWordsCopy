@@ -30,6 +30,7 @@ import { getPracticeWordCache, setPracticeWordCache } from '@/utils/cache.ts'
 import { ShortcutKey, WordPracticeMode, WordPracticeStage, WordPracticeType } from '@/types/enum.ts'
 import prefixTxt from './template-vue-prefix.txt?raw'
 import suffixTxt from './template-vue-suffix.txt?raw'
+import Footer from '@/components/word/Footer.vue'
 
 const { isWordCollect, toggleWordCollect, isWordSimple, toggleWordSimple } = useWordOptions()
 const settingStore = useSettingStore()
@@ -584,9 +585,8 @@ function toggleDictation() {
   settingStore.dictation = !settingStore.dictation
 }
 
-function toggleConciseMode() {
+function toggleToolbar() {
   settingStore.showToolbar = !settingStore.showToolbar
-  settingStore.showPanel = settingStore.showToolbar
 }
 
 function togglePanel() {
@@ -672,7 +672,7 @@ useEvents([
   [ShortcutKey.ToggleShowTranslate, toggleTranslate],
   [ShortcutKey.ToggleDictation, toggleDictation],
   [ShortcutKey.ToggleTheme, toggleTheme],
-  [ShortcutKey.ToggleConciseMode, toggleConciseMode],
+  [ShortcutKey.ToggleToolbar, toggleToolbar],
   [ShortcutKey.TogglePanel, togglePanel],
   [ShortcutKey.RandomWrite, randomWrite],
 ])
@@ -681,9 +681,9 @@ useEvents([
 <template>
   <PracticeLayout v-loading="loading" panelLeft="var(--word-panel-margin-left)">
     <template v-slot:practice>
-      <div class="mb-20 color-[var(--color-practice-font2)] text-base">
+      <div class="mb-20 color-[var(--color-practice-font2)] monaco-workbench text-base">
         <div v-html="prefixTxt"></div>
-        <div class="px-4 mb-6">
+        <div class="px-4 mb-3">
           <TypeWord ref="typingRef" :word="word" @wrong="onTypeWrong" @complete="next" @know="onWordKnow" />
         </div>
         <div v-html="suffixTxt"></div>
@@ -733,7 +733,9 @@ useEvents([
     </template>
     <template v-slot:footer>
       <div class="footer-container p-4">
-        <div class="flex justify-between p-1 items-center border-item-solid border-green-700/20 rounded-t-xl mx-2 text-gray-600 text-sm">
+        <div
+          class="flex justify-between p-1 items-center border-item-solid border-green-700/20 rounded-t-xl mx-2 text-gray-600 text-sm"
+        >
           <div>
             <IconFluentChevronLeft20Filled class="transform-rotate-180 font-size-2.5 mr-2" />
             <span>4 File</span>
@@ -774,14 +776,15 @@ useEvents([
           </div>
         </div>
       </div>
-      <!--      <Footer-->
-      <!--        :is-simple="isWordSimple(word)"-->
-      <!--        @toggle-simple="toggleWordSimpleWrapper"-->
-      <!--        :is-collect="isWordCollect(word)"-->
-      <!--        @toggle-collect="toggleWordCollect(word)"-->
-      <!--        @skip="next(false)"-->
-      <!--        @skipStep="skipStep"-->
-      <!--      />-->
+      <Footer
+        v-if="settingStore.showToolbar"
+        :is-simple="isWordSimple(word)"
+        @toggle-simple="toggleWordSimpleWrapper"
+        :is-collect="isWordCollect(word)"
+        @toggle-collect="toggleWordCollect(word)"
+        @skip="next(false)"
+        @skipStep="skipStep"
+      />
     </template>
   </PracticeLayout>
   <Statistics v-model="showStatDialog" />

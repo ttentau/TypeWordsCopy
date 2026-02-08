@@ -18,7 +18,6 @@ defineProps<{
       </div>
       <div
         class="panel-wrap"
-        :style="{ left: panelLeft }"
         :class="{ 'has-panel': settingStore.showPanel }"
         @click.self="settingStore.showPanel = false"
       >
@@ -35,7 +34,8 @@ defineProps<{
 .panel-wrap {
   position: fixed;
   top: 0.8rem;
-  z-index: 1;
+  z-index: 9999;
   height: calc(100vh - 1.8rem);
+  right: 0;
 }
 </style>

@@ -64098,7 +64098,7 @@ body.agent-unification-enabled .monaco-workbench .part.panel .simple-find-part-w
 .monaco-workbench .part.editor>.content .gettingStartedContainer .gettingStartedSlideDetails .gettingStartedDetailsContent.image>.getting-started-media {
   align-self: unset;
   display: flex;
-  /*grid-area: title-start/media-start/steps-end/media-end;*/
+  grid-area: title-start/media-start/steps-end/media-end;
   justify-content: center
 }
 

@@ -541,19 +541,15 @@ useEvents([
       "
     >
       <template v-if="word?.sentences?.length">
-        <div class="line-white my-1"></div>
-
-        <div class="flex flex-col gap-">
+<!--        <div class="line-white my-1"></div>-->
+        <div class="flex flex-col gap-2 mt-2">
           <div class="sentence" v-for="item in word.sentences">
-            <HoverReveal class="flex gap-1">
-              <span class="text-sm">
-                <span class="shrink-0">Read </span>
-                <SentenceHightLightWord
-                  :text="item.c"
-                  :word="word.word"
-                  :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
-                />
-              </span>
+            <HoverReveal class="text-sm flex gap-1">
+              <SentenceHightLightWord
+                :text="item.c"
+                :word="word.word"
+                :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
+              />
               <template v-slot:hover>
                 <VolumeIcon :title="`发音`" :simple="false" @click="ttsPlayAudio(item.c)" />
               </template>
@@ -575,7 +571,7 @@ useEvents([
               :word="word.word"
               :dictation="!(!settingStore.dictation || showFullWord || showWordResult)"
             />
-            <span class="anim shrink-0" v-opacity="settingStore.translate || showFullWord || showWordResult">
+            <span class="anim shrink-0 text-sm" v-opacity="settingStore.translate || showFullWord || showWordResult">
               {{ item.cn }}
             </span>
           </div>
