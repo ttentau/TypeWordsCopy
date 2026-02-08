@@ -1,6 +1,10 @@
 <script setup lang="ts">
 let logList = [
   {
+    date: '2026/02/09',
+    content: '发布 Vscode 插件',
+  },
+  {
     date: '2026/02/04',
     content: '在首页加一个单词测试的入口',
   },
