@@ -527,7 +527,6 @@ function onTypeWrong() {
   if (!data.wrongWords.find((v: Word) => v.word.toLowerCase() === temp)) {
     data.wrongWords.push(word)
   }
-  savePracticeData()
 }
 
 function savePracticeData() {
